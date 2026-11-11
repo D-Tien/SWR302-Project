@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thanh toán – Gia Hoa Phat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/main.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body { background: #FFF8F0; font-family: 'Nunito', sans-serif; color: #332A25; }
+
+    /* ── Checkout Header ── */
+    .checkout-header {
+      background: #fff; border-bottom: 1px solid #EDE5DB;
+      padding: 16px 24px; display: flex; align-items: center; justify-content: space-between;
+    }
+    .checkout-logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #D97745; font-weight: 700; text-decoration: none; }
+    .checkout-secure { font-size: 13px; color: #789B75; font-weight: 700; display: flex; align-items: center; gap: 6px; }
+
+    /* Breadcrumb steps */
+    .checkout-steps {
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      padding: 16px; background: #fff; border-bottom: 1px solid #EDE5DB;
+      flex-wrap: wrap; font-size: 13px;
+    }
+    .step { display: flex; align-items: center; gap: 6px; color: #bbb; }
+    .step.active { color: #D97745; font-weight: 700; }
+    .step.done { color: #789B75; }
+    .step-num {
+      width: 24px; height: 24px; border-radius: 50%; border: 2px solid currentColor;
+      display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 800;
+    }
+    .step-sep { color: #ccc; }
+
+    /* Layout */
+    .checkout-wrap { max-width: 1100px; margin: 0 auto; padding: 28px 16px 60px; display: flex; gap: 28px; align-items: flex-start; }
+    .checkout-left  { flex: 0 0 60%; min-width: 0; }
+    .checkout-right { flex: 1; position: sticky; top: 90px; }
+
+    @media (max-width: 860px) {
+      .checkout-wrap { flex-direction: column; }
+      .checkout-left, .checkout-right { flex: none; width: 100%; }
+      .checkout-right { position: static; }
+    }
+
+    /* Section cards */
+    .checkout-section {
+      background: #fff; border: 1.5px solid #EDE5DB; border-radius: 16px;
+      padding: 22px; margin-bottom: 20px;
+    }
+    .checkout-section h3 {
+      font-family: 'Playfair Display', serif; font-size: 1.1rem; color: #332A25;
+      margin: 0 0 18px; padding-bottom: 12px; border-bottom: 1px solid #F5EDE3;
+    }
+
+    /* Form */
+    .form-group { margin-bottom: 16px; }
+    .form-label { display: block; font-size: 13px; font-weight: 700; color: #555; margin-bottom: 6px; }
+    .form-label .req { color: #D97745; }
+    .form-control {
+      width: 100%; padding: 11px 14px; border: 1.5px solid #EDE5DB; border-radius: 10px;
+      font-size: 14px; font-family: 'Nunito', sans-serif; color: #332A25;
+      transition: border-color 0.2s, box-shadow 0.2s; outline: none; background: #fff;
+    }
+    .form-control:focus { border-color: #D97745; box-shadow: 0 0 0 3px rgba(217,119,69,0.12); }
+    .form-control.error { border-color: #c62828; }
+    .form-row { display: flex; gap: 14px; }
+    .form-row .form-group { flex: 1; }
+    @media (max-width: 600px) { .form-row { flex-direction: column; gap: 0; } }
+
+    .field-error { font-size: 12px; color: #c62828; margin-top: 4px; display: none; }
+    .field-error.show { display: block; }
+
+    /* Address radio */
+    .address-radio-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 14px; }
+    .address-radio-card {
+      display: flex; align-items: flex-start; gap: 12px;
+      border: 1.5px solid #EDE5DB; border-radius: 12px; padding: 14px;
+      cursor: pointer; transition: border-color 0.2s, background 0.2s;
+    }
+    .address-radio-card:hover { border-color: #D97745; background: #FFF8F0; }
+    .address-radio-card input[type=radio] { margin-top: 3px; accent-color: #D97745; }
+    .addr-name { font-weight: 700; font-size: 14px; }
+    .addr-detail { font-size: 13px; color: #666; line-height: 1.6; }
+    .addr-new-btn {
+      display: flex; align-items: center; gap: 8px;
+      padding: 11px 16px; border: 2px dashed #D97745; border-radius: 12px;
+      cursor: pointer; color: #D97745; font-weight: 700; font-size: 14px;
+      background: none; width: 100%; font-family: 'Nunito', sans-serif;
+      transition: background 0.2s;
+    }
+    .addr-new-btn:hover { background: #FFF8F0; }
+
+    /* Payment */
+    .payment-option {
+      display: flex; align-items: flex-start; gap: 12px;
+      border: 2px solid #D97745; border-radius: 12px; padding: 14px;
+      background: #FFF8F0;
+    }
+    .payment-option input { margin-top: 3px; accent-color: #D97745; }
+    .payment-label { font-weight: 700; font-size: 15px; color: #332A25; margin-bottom: 4px; }
+    .payment-note { font-size: 13px; color: #888; }
+
+    /* Delivery fee alert */
+    .delivery-info-box {
+      display: flex; align-items: center; gap: 10px;
+      padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 600;
+      margin-top: 14px;
+    }
+    .delivery-info-box.ok { background: #E8F5E9; color: #2e7d32; border: 1px solid #c8e6c9; }
+    .delivery-info-box.error { background: #FFEBEE; color: #c62828; border: 1px solid #ffcdd2; }
+    .delivery-info-box.na { background: #FFF3E0; color: #e65100; border: 1px solid #ffe0b2; }
+
+    /* Summary */
+    .order-summary-box { background: #fff; border: 1.5px solid #EDE5DB; border-radius: 20px; padding: 24px; }
+    .order-summary-box h3 { font-family: 'Playfair Display', serif; font-size: 1.15rem; color: #332A25; margin: 0 0 16px; }
+    .order-item-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 8px 0; border-bottom: 1px solid #F5EDE3; font-size: 13.5px; }
+    .order-item-name { flex: 1; color: #332A25; padding-right: 10px; }
+    .order-item-qty { color: #888; white-space: nowrap; }
+    .order-item-sub { font-weight: 700; white-space: nowrap; color: #332A25; }
+    .summary-divider { border: none; border-top: 1px solid #EDE5DB; margin: 16px 0; }
+    .summary-line { display: flex; justify-content: space-between; padding: 7px 0; font-size: 14px; }
+    .summary-line.total { font-size: 17px; font-weight: 800; color: #D97745; border-top: 2px solid #EDE5DB; padding-top: 14px; margin-top: 6px; }
+    .summary-line .s-label { color: #666; }
+    .summary-line.total .s-label { color: #332A25; }
+    .summary-line .s-value { font-weight: 700; }
+
+    .btn-place-order {
+      display: block; width: 100%; padding: 16px; margin-top: 20px;
+      background: #D97745; color: #fff; border: none; border-radius: 12px;
+      font-size: 16px; font-weight: 800; cursor: pointer; font-family: 'Nunito', sans-serif;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+    }
+    .btn-place-order:hover:not(:disabled) { background: #c46535; transform: translateY(-2px); box-shadow: 0 6px 24px rgba(217,119,69,0.35); }
+    .btn-place-order:disabled { background: #ccc; cursor: not-allowed; }
+
+    .order-terms { font-size: 12px; color: #aaa; text-align: center; margin-top: 12px; line-height: 1.6; }
+
+    /* Toast */
+    #toast-container { position: fixed; top: 24px; right: 24px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+  </style>
+</head>
+<body>
+
+<!-- ── Checkout Header ── -->
+<header class="checkout-header">
+  <a href="index.html" class="checkout-logo">🍰 GHP</a>
+  <span class="checkout-secure">🔒 Thanh toán an toàn</span>
+</header>
+
+<!-- ── Steps ── -->
+<div class="checkout-steps">
+  <div class="step done">
+    <div class="step-num">✓</div>
+    <span>Giỏ hàng</span>
+  </div>
+  <span class="step-sep">›</span>
+  <div class="step active">
+    <div class="step-num">2</div>
+    <span>Thông tin giao hàng</span>
+  </div>
+  <span class="step-sep">›</span>
+  <div class="step">
+    <div class="step-num">3</div>
+    <span>Xác nhận</span>
+  </div>
+</div>
+
+<div id="toast-container"></div>
+
+<div class="checkout-wrap">
+
+  <!-- ── LEFT: Forms ── -->
+  <div class="checkout-left">
+
+    <!-- Contact Info -->
+    <div class="checkout-section">
+      <h3>📞 Thông tin liên hệ</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label class="form-label">Họ tên <span class="req">*</span></label>
+          <input type="text" class="form-control" id="contact-name" placeholder="Nguyễn Văn A" />
+          <div class="field-error" id="err-contact-name">Vui lòng nhập họ tên</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Số điện thoại <span class="req">*</span></label>
+          <input type="tel" class="form-control" id="contact-phone" placeholder="09xxxxxxxx" />
+          <div class="field-error" id="err-contact-phone">Vui lòng nhập số điện thoại hợp lệ</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Delivery Address -->
+    <div class="checkout-section">
+      <h3>📍 Địa chỉ giao hàng</h3>
+
+      <!-- Saved addresses (shown only if user has them) -->
+      <div id="saved-addresses-block" style="display:none;">
+        <div class="address-radio-list" id="saved-addresses-list"></div>
+        <button class="addr-new-btn" onclick="toggleNewAddressForm()" id="new-addr-toggle-btn">
+          ＋ Thêm địa chỉ mới
+        </button>
+      </div>
+
+      <!-- New address form -->
+      <div id="new-address-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Họ tên người nhận <span class="req">*</span></label>
+            <input type="text" class="form-control" id="recv-name" placeholder="Nguyễn Văn A" />
+            <div class="field-error" id="err-recv-name">Vui lòng nhập tên người nhận</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Số điện thoại <span class="req">*</span></label>
+            <input type="tel" class="form-control" id="recv-phone" placeholder="09xxxxxxxx" />
+            <div class="field-error" id="err-recv-phone">Vui lòng nhập số điện thoại hợp lệ</div>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Địa chỉ (số nhà, đường) <span class="req">*</span></label>
+          <input type="text" class="form-control" id="addr-street" placeholder="123 Đường Nguyễn Trãi" />
+          <div class="field-error" id="err-addr-street">Vui lòng nhập địa chỉ</div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Phường/Xã <span class="req">*</span></label>
+          <input type="text" class="form-control" id="addr-ward" placeholder="Phường 2" />
+          <div class="field-error" id="err-addr-ward">Vui lòng nhập phường/xã</div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Thành phố/Tỉnh <span class="req">*</span></label>
+            <select class="form-control" id="addr-city" onchange="onCityChange()">
+              <option value="">-- Chọn tỉnh/thành --</option>
+              <option value="HCM">TP. Hồ Chí Minh</option>
+              <option value="HN">Hà Nội</option>
+              <option value="DN">Đà Nẵng</option>
+              <option value="CT">Cần Thơ</option>
+              <option value="BD">Bình Dương</option>
+            </select>
+            <div class="field-error" id="err-addr-city">Vui lòng chọn tỉnh/thành</div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Quận/Huyện <span class="req">*</span></label>
+            <select class="form-control" id="addr-district" onchange="onDistrictChange()">
+              <option value="">-- Chọn quận/huyện --</option>
+            </select>
+            <div class="field-error" id="err-addr-district">Vui lòng chọn quận/huyện</div>
+          </div>
+        </div>
+
+        <!-- Delivery fee info -->
+        <div id="delivery-fee-box" style="display:none;"></div>
+      </div>
+    </div>
+
+    <!-- Payment Method -->
+    <div class="checkout-section">
+      <h3>💳 Phương thức thanh toán</h3>
+      <div class="payment-option">
+        <input type="radio" name="payment" id="pay-cod" value="COD" checked disabled />
+        <div>
+          <div class="payment-label">💵 Thanh toán khi nhận hàng (COD)</div>
+          <div class="payment-note">Thanh toán bằng tiền mặt khi nhận hàng. Vui lòng chuẩn bị đúng số tiền.</div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /checkout-left -->
+
+  <!-- ── RIGHT: Order Summary ── -->
+  <div class="checkout-right">
+    <div class="order-summary-box">
+      <h3>🧾 Đơn hàng của bạn</h3>
+      <div id="order-items-list"><div style="text-align:center;color:#aaa;padding:20px;">Đang tải…</div></div>
+      <hr class="summary-divider" />
+      <div class="summary-line">
+        <span class="s-label">Tạm tính</span>
+        <span class="s-value" id="co-subtotal">0 ₫</span>
+      </div>
+      <div class="summary-line">
+        <span class="s-label">Phí giao hàng</span>
+        <span class="s-value" id="co-fee">— Chưa tính</span>
+      </div>
+      <div class="summary-line total">
+        <span class="s-label">Tổng cộng</span>
+        <span class="s-value" id="co-total">0 ₫</span>
+      </div>
+      <button class="btn-place-order" id="place-order-btn" onclick="placeOrder()">
+        ✅ Xác nhận đặt hàng
+      </button>
+      <p class="order-terms">Bằng cách đặt hàng, bạn đồng ý với <a href="#" style="color:#D97745;">điều khoản sử dụng</a> của chúng tôi.</p>
+    </div>
+  </div>
+
+</div><!-- /checkout-wrap -->
+
+<script src="scripts/main.js" defer></script>
+<script>
+/* ══ CHECKOUT PAGE LOGIC ══ */
+
+const DISTRICTS = {
+  HCM: {
+    inner: ['Quận 1','Quận 3','Quận 4','Quận 5','Quận 6','Quận 8','Quận 10','Quận 11','Quận Phú Nhuận','Quận Bình Thạnh','Quận Gò Vấp','Quận Tân Bình','Quận Tân Phú'],
+    outer: ['Quận 2','Quận 7','Quận 9','Quận 12','Quận Bình Tân','Huyện Bình Chánh','Huyện Hóc Môn','Huyện Nhà Bè','Huyện Củ Chi','Huyện Cần Giờ','Thành phố Thủ Đức']
+  },
+  HN:  ['Quận Hoàn Kiếm','Quận Ba Đình','Quận Đống Đa','Quận Hai Bà Trưng','Quận Cầu Giấy','Quận Thanh Xuân','Quận Hà Đông'],
+  DN:  ['Quận Hải Châu','Quận Thanh Khê','Quận Sơn Trà','Quận Ngũ Hành Sơn','Quận Liên Chiểu','Quận Cẩm Lệ','Huyện Hòa Vang'],
+  CT:  ['Quận/Huyện 1','Quận/Huyện 2','Quận/Huyện 3'],
+  BD:  ['Quận/Huyện 1','Quận/Huyện 2','Quận/Huyện 3']
+};
+
+const DELIVERY_FEES = {
+  HCM_inner:  20000,
+  HCM_outer:  35000,
+  HN:         30000,
+  DN:         30000,
+  CT:         25000,
+  BD:         25000
+};
+
+let currentDeliveryFee = null;
+let deliveryAreaOk = false;
+
+function fmt(n) { return n.toLocaleString('vi-VN') + ' ₫'; }
+
+function getCart() {
+  try { return JSON.parse(localStorage.getItem('ghp_cart') || '[]'); } catch { return []; }
+}
+
+function calcSubtotal(cart) {
+  return cart.reduce((s, i) => s + i.price * i.qty, 0);
+}
+
+function onCityChange() {
+  const city = document.getElementById('addr-city').value;
+  const distSelect = document.getElementById('addr-district');
+  distSelect.innerHTML = '<option value="">-- Chọn quận/huyện --</option>';
+  currentDeliveryFee = null;
+  deliveryAreaOk = false;
+  document.getElementById('delivery-fee-box').style.display = 'none';
+
+  let opts = [];
+  if (city === 'HCM') {
+    opts = [...DISTRICTS.HCM.inner.map(d => ({v:d,l:d})), ...DISTRICTS.HCM.outer.map(d => ({v:d,l:d}))];
+  } else if (DISTRICTS[city]) {
+    opts = DISTRICTS[city].map(d => ({v:d,l:d}));
+  }
+  opts.forEach(o => {
+    const opt = document.createElement('option');
+    opt.value = o.v; opt.textContent = o.l;
+    distSelect.appendChild(opt);
+  });
+  updateOrderTotals();
+  updatePlaceOrderBtn();
+}
+
+function onDistrictChange() {
+  const city = document.getElementById('addr-city').value;
+  const dist = document.getElementById('addr-district').value;
+  const feeBox = document.getElementById('delivery-fee-box');
+
+  if (!city || !dist) {
+    feeBox.style.display = 'none';
+    currentDeliveryFee = null;
+    deliveryAreaOk = false;
+    updateOrderTotals();
+    updatePlaceOrderBtn();
+    return;
+  }
+
+  let feeKey = null;
+  if (city === 'HCM') {
+    const isInner = DISTRICTS.HCM.inner.includes(dist);
+    feeKey = isInner ? 'HCM_inner' : 'HCM_outer';
+  } else {
+    feeKey = city;
+  }
+
+  if (DELIVERY_FEES[feeKey] !== undefined) {
+    currentDeliveryFee = DELIVERY_FEES[feeKey];
+    deliveryAreaOk = true;
+    feeBox.style.display = 'block';
+    feeBox.innerHTML = `<div class="delivery-info-box ok">🚚 Phí giao hàng: <strong>${fmt(currentDeliveryFee)}</strong></div>`;
+  } else {
+    currentDeliveryFee = null;
+    deliveryAreaOk = false;
+    feeBox.style.display = 'block';
+    feeBox.innerHTML = `<div class="delivery-info-box error">❌ Khu vực chưa hỗ trợ giao hàng. Vui lòng chọn khu vực khác.</div>`;
+  }
+
+  updateOrderTotals();
+  updatePlaceOrderBtn();
+}
+
+function updateOrderTotals() {
+  const cart = getCart();
+  const subtotal = calcSubtotal(cart);
+  document.getElementById('co-subtotal').textContent = fmt(subtotal);
+  if (currentDeliveryFee !== null && deliveryAreaOk) {
+    document.getElementById('co-fee').textContent = fmt(currentDeliveryFee);
+    document.getElementById('co-total').textContent = fmt(subtotal + currentDeliveryFee);
+  } else {
+    document.getElementById('co-fee').textContent = '— Chưa tính';
+    document.getElementById('co-total').textContent = fmt(subtotal);
+  }
+}
+
+function updatePlaceOrderBtn() {
+  const btn = document.getElementById('place-order-btn');
+  btn.disabled = !deliveryAreaOk;
+}
+
+function showToastLocal(msg, type = 'success') {
+  if (typeof showToast === 'function') { showToast(msg, type); return; }
+  const c = document.getElementById('toast-container') || document.body;
+  const t = document.createElement('div');
+  t.style.cssText = `position:fixed;top:24px;right:24px;z-index:9999;background:${type==='success'?'#2e7d32':'#c62828'};color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,0.2);`;
+  t.textContent = msg;
+  document.body.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+function fieldErr(id, show) {
+  const el = document.getElementById('err-' + id);
+  const inp = document.getElementById(id);
+  if (!el || !inp) return;
+  el.classList.toggle('show', show);
+  inp.classList.toggle('error', show);
+}
+
+function validatePhone(phone) { return /^(0|\+84)[0-9]{8,10}$/.test(phone.replace(/\s/g,'')); }
+
+function validateForm() {
+  let ok = true;
+  const contactName  = document.getElementById('contact-name').value.trim();
+  const contactPhone = document.getElementById('contact-phone').value.trim();
+  const recvName     = document.getElementById('recv-name').value.trim();
+  const recvPhone    = document.getElementById('recv-phone').value.trim();
+  const street       = document.getElementById('addr-street').value.trim();
+  const ward         = document.getElementById('addr-ward').value.trim();
+  const city         = document.getElementById('addr-city').value;
+  const dist         = document.getElementById('addr-district').value;
+
+  if (!contactName) { fieldErr('contact-name', true); ok = false; } else { fieldErr('contact-name', false); }
+  if (!validatePhone(contactPhone)) { fieldErr('contact-phone', true); ok = false; } else { fieldErr('contact-phone', false); }
+
+  // If using new address form
+  if (document.getElementById('new-address-form').style.display !== 'none') {
+    if (!recvName) { fieldErr('recv-name', true); ok = false; } else { fieldErr('recv-name', false); }
+    if (!validatePhone(recvPhone)) { fieldErr('recv-phone', true); ok = false; } else { fieldErr('recv-phone', false); }
+    if (!street) { fieldErr('addr-street', true); ok = false; } else { fieldErr('addr-street', false); }
+    if (!ward)   { fieldErr('addr-ward', true); ok = false; } else { fieldErr('addr-ward', false); }
+    if (!city)   { fieldErr('addr-city', true); ok = false; } else { fieldErr('addr-city', false); }
+    if (!dist)   { fieldErr('addr-district', true); ok = false; } else { fieldErr('addr-district', false); }
+  }
+
+  return ok;
+}
+
+function placeOrder() {
+  const cart = getCart();
+  if (!cart.length) { showToastLocal('Giỏ hàng đang trống!', 'error'); return; }
+
+  if (!validateForm()) { showToastLocal('Vui lòng điền đầy đủ thông tin!', 'error'); return; }
+
+  if (!deliveryAreaOk) {
+    showToastLocal('Khu vực này chưa hỗ trợ giao hàng!', 'error'); return;
+  }
+
+  const contactName  = document.getElementById('contact-name').value.trim();
+  const contactPhone = document.getElementById('contact-phone').value.trim();
+  const recvName     = document.getElementById('recv-name').value.trim();
+  const recvPhone    = document.getElementById('recv-phone').value.trim();
+  const street       = document.getElementById('addr-street').value.trim();
+  const ward         = document.getElementById('addr-ward').value.trim();
+  const cityEl       = document.getElementById('addr-city');
+  const districtEl   = document.getElementById('addr-district');
+  const cityText     = cityEl.options[cityEl.selectedIndex]?.text || '';
+  const distText     = districtEl.value || '';
+
+  const fullAddress  = `${street}, ${ward}, ${distText}, ${cityText}`;
+  const subtotal     = calcSubtotal(cart);
+  const deliveryFee  = currentDeliveryFee || 0;
+  const total        = subtotal + deliveryFee;
+  const orderId      = 'GHP' + Date.now().toString().slice(-8);
+  const now          = new Date().toISOString();
+
+  const order = {
+    id: orderId,
+    items: cart,
+    contact: { name: contactName, phone: contactPhone },
+    address: {
+      recipientName: recvName || contactName,
+      recipientPhone: recvPhone || contactPhone,
+      fullAddress: fullAddress
+    },
+    deliveryFee: deliveryFee,
+    subtotal: subtotal,
+    total: total,
+    paymentMethod: 'COD',
+    orderStatus: 'Pending',
+    paymentStatus: 'Unpaid',
+    createdAt: now,
+    timeline: [{ status: 'Pending', time: now, note: 'Đơn hàng đã được đặt' }]
+  };
+
+  // Save order
+  let orders = [];
+  try { orders = JSON.parse(localStorage.getItem('ghp_orders') || '[]'); } catch {}
+  orders.unshift(order);
+  localStorage.setItem('ghp_orders', JSON.stringify(orders));
+
+  // Clear cart
+  localStorage.setItem('ghp_cart', '[]');
+  if (typeof updateCartCount === 'function') updateCartCount();
+
+  // Redirect to success page
+  window.location.href = `order-success.html?id=${orderId}`;
+}
+
+// Saved addresses
+function toggleNewAddressForm() {
+  const form = document.getElementById('new-address-form');
+  const btn  = document.getElementById('new-addr-toggle-btn');
+  const show = form.style.display === 'none';
+  form.style.display = show ? '' : 'none';
+  btn.textContent = show ? '✕ Hủy thêm địa chỉ mới' : '＋ Thêm địa chỉ mới';
+}
+
+function useSelectedSavedAddress(addr) {
+  // Fill in the new address form from saved address
+  document.getElementById('recv-name').value   = addr.name  || '';
+  document.getElementById('recv-phone').value  = addr.phone || '';
+  document.getElementById('addr-street').value = addr.address || '';
+  document.getElementById('addr-ward').value   = addr.ward  || '';
+  // Try to match city
+  const cityMap = { 'TP. Hồ Chí Minh': 'HCM', 'Hà Nội': 'HN', 'Đà Nẵng': 'DN', 'Cần Thơ': 'CT', 'Bình Dương': 'BD' };
+  const cityKey = cityMap[addr.city] || '';
+  document.getElementById('addr-city').value = cityKey;
+  if (cityKey) { onCityChange(); }
+  setTimeout(() => {
+    if (addr.district) {
+      document.getElementById('addr-district').value = addr.district;
+      onDistrictChange();
+    }
+  }, 100);
+}
+
+function renderSavedAddresses(user) {
+  if (!user || !user.addresses || !user.addresses.length) return;
+  const block = document.getElementById('saved-addresses-block');
+  const list  = document.getElementById('saved-addresses-list');
+  block.style.display = '';
+  document.getElementById('new-address-form').style.display = 'none';
+
+  list.innerHTML = user.addresses.map((addr, i) => `
+    <label class="address-radio-card" onclick="useSelectedSavedAddress(${JSON.stringify(addr).replace(/"/g,'&quot;')})">
+      <input type="radio" name="saved-addr" value="${i}" ${addr.isDefault?'checked':''} />
+      <div>
+        <div class="addr-name">${addr.name} – ${addr.phone}</div>
+        <div class="addr-detail">${addr.address}, ${addr.ward || ''}, ${addr.district || ''}, ${addr.city}</div>
+        ${addr.isDefault ? '<span style="font-size:11px;background:#D97745;color:#fff;padding:2px 8px;border-radius:6px;font-weight:700;">Mặc định</span>' : ''}
+      </div>
+    </label>`).join('');
+
+  // Auto-fill with default address
+  const def = user.addresses.find(a => a.isDefault) || user.addresses[0];
+  if (def) useSelectedSavedAddress(def);
+}
+
+function renderOrderItems() {
+  const cart = getCart();
+  const list = document.getElementById('order-items-list');
+  if (!cart.length) {
+    list.innerHTML = '<div style="text-align:center;color:#aaa;padding:16px;">Giỏ hàng trống</div>';
+    return;
+  }
+  list.innerHTML = cart.map(item => `
+    <div class="order-item-row">
+      <span class="order-item-name">${item.name}</span>
+      <span class="order-item-qty">×${item.qty}</span>
+      <span class="order-item-sub">${fmt(item.price * item.qty)}</span>
+    </div>`).join('');
+  updateOrderTotals();
+}
+
+function initCheckout() {
+  // Auth guard
+  const loggedIn = typeof isLoggedIn === 'function' ? isLoggedIn() : !!sessionStorage.getItem('ghp_user');
+  if (!loggedIn) {
+    window.location.href = 'login.html?redirect=checkout';
+    return;
+  }
+
+  // Pre-fill contact info
+  let user = null;
+  try {
+    user = JSON.parse(sessionStorage.getItem('ghp_user') || 'null');
+  } catch {}
+
+  if (user) {
+    document.getElementById('contact-name').value  = user.name  || '';
+    document.getElementById('contact-phone').value = user.phone || '';
+    if (user.name) document.getElementById('recv-name').value  = user.name;
+    if (user.phone) document.getElementById('recv-phone').value = user.phone;
+    renderSavedAddresses(user);
+  }
+
+  renderOrderItems();
+  updatePlaceOrderBtn();
+
+  if (typeof renderHeader === 'function') renderHeader();
+  if (typeof updateCartCount === 'function') updateCartCount();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initCheckout);
+} else {
+  initCheckout();
+}
+</script>
+</body>
+</html>

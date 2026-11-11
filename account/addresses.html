@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Địa chỉ giao hàng – Gia Hoa Phat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles/main.css" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;}
+    body{font-family:'Nunito',sans-serif;background:#FAF7F4;color:#332A25;margin:0;}
+    .header-top{background:#D97745;color:#fff;text-align:center;padding:6px 16px;font-size:12px;font-weight:600;display:flex;justify-content:center;gap:28px;flex-wrap:wrap;}
+    .header-main{background:#fff;border-bottom:2px solid #EDE5DB;padding:12px 16px;}
+    .header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .logo-icon{font-size:30px;}
+    .logo-title{display:block;font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#D97745;line-height:1;}
+    .logo-sub{display:block;font-size:11px;color:#789B75;font-weight:600;}
+    .header-actions{display:flex;align-items:center;gap:14px;}
+    .cart-btn{font-size:22px;text-decoration:none;position:relative;}
+    .cart-badge{position:absolute;top:-6px;right:-8px;background:#D97745;color:#fff;border-radius:50%;width:18px;height:18px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+
+    .account-layout{display:grid;grid-template-columns:260px 1fr;gap:24px;max-width:1100px;margin:32px auto;padding:0 16px;align-items:start;}
+    @media(max-width:768px){.account-layout{grid-template-columns:1fr;}}
+
+    .account-sidebar{background:#fff;border-radius:12px;border:1px solid #EDE5DB;overflow:hidden;box-shadow:0 2px 8px rgba(51,42,37,.06);}
+    .sidebar-header{background:#D97745;color:#fff;padding:20px 20px 16px;}
+    .sidebar-header .avatar-circle{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;margin-bottom:10px;}
+    .sidebar-header .user-name{font-weight:700;font-size:15px;}
+    .sidebar-header .user-email{font-size:12px;opacity:.85;}
+    .sidebar-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#999;padding:14px 20px 6px;}
+    .sidebar-menu{list-style:none;padding:0 0 12px;margin:0;}
+    .sidebar-menu li a{display:flex;align-items:center;gap:10px;padding:11px 20px;font-size:14px;font-weight:600;color:#332A25;text-decoration:none;transition:background .15s,color .15s;}
+    .sidebar-menu li a:hover{background:#FFF8F0;color:#D97745;}
+    .sidebar-menu li a.active{background:#FFF3EA;color:#D97745;border-left:3px solid #D97745;}
+    .sidebar-menu li a .menu-icon{font-size:16px;width:20px;text-align:center;}
+
+    .account-card{background:#fff;border-radius:12px;border:1px solid #EDE5DB;box-shadow:0 2px 8px rgba(51,42,37,.06);padding:32px;}
+    .card-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:24px;padding-bottom:16px;border-bottom:2px solid #EDE5DB;flex-wrap:wrap;gap:12px;}
+    .card-header h2{font-family:'Playfair Display',serif;font-size:22px;color:#332A25;margin:0;}
+
+    .btn-primary{background:#D97745;color:#fff;border:none;border-radius:8px;padding:11px 22px;font-size:14px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;transition:background .2s;}
+    .btn-primary:hover{background:#c4612d;}
+    .btn-primary:disabled{background:#ccc;cursor:not-allowed;}
+    .btn-secondary{background:#fff;color:#332A25;border:1.5px solid #EDE5DB;border-radius:8px;padding:9px 18px;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;transition:background .2s;}
+    .btn-secondary:hover{background:#FFF8F0;}
+    .btn-danger{background:#fff;color:#f44336;border:1.5px solid #f44336;border-radius:8px;padding:9px 14px;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;}
+    .btn-danger:hover{background:#FFF5F5;}
+    .btn-link{background:none;border:none;color:#D97745;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;padding:9px 0;text-decoration:underline;}
+
+    /* Address cards */
+    .address-list{display:flex;flex-direction:column;gap:14px;}
+    .address-card{border:1.5px solid #EDE5DB;border-radius:10px;padding:18px 20px;position:relative;transition:border-color .2s;}
+    .address-card.is-default{border-color:#789B75;background:#F6FAF5;}
+    .address-card-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:8px;}
+    .address-name{font-weight:700;font-size:15px;}
+    .address-phone{font-size:13px;color:#666;margin-top:2px;}
+    .address-line{font-size:14px;color:#332A25;margin-top:6px;line-height:1.5;}
+    .default-badge{display:inline-flex;align-items:center;gap:4px;background:#E8F5E9;color:#2E7D32;font-size:11px;font-weight:700;padding:3px 10px;border-radius:20px;}
+    .address-actions{display:flex;align-items:center;gap:8px;margin-top:14px;flex-wrap:wrap;}
+
+    .empty-state{text-align:center;padding:48px 20px;color:#999;}
+    .empty-state .empty-icon{font-size:48px;margin-bottom:12px;}
+    .empty-state p{font-size:14px;}
+
+    .limit-note{background:#FFF8F0;border:1px solid #EDE5DB;border-radius:8px;padding:12px 16px;font-size:13px;color:#888;margin-bottom:16px;}
+
+    /* Modal */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;}
+    .modal-overlay.hidden{display:none;}
+    .modal-box{background:#fff;border-radius:16px;width:100%;max-width:540px;max-height:90vh;overflow-y:auto;padding:32px;position:relative;}
+    .modal-box h3{font-family:'Playfair Display',serif;font-size:20px;color:#332A25;margin:0 0 20px;}
+    .modal-close{position:absolute;top:16px;right:18px;background:none;border:none;font-size:22px;cursor:pointer;color:#888;}
+    .form-group{margin-bottom:16px;}
+    .form-group label{display:block;font-size:13px;font-weight:700;color:#332A25;margin-bottom:6px;}
+    .form-group input,.form-group select{width:100%;padding:10px 14px;border-radius:8px;border:1.5px solid #EDE5DB;font-size:14px;font-family:'Nunito',sans-serif;color:#332A25;background:#fff;transition:border-color .2s;box-sizing:border-box;}
+    .form-group input:focus,.form-group select:focus{outline:none;border-color:#D97745;box-shadow:0 0 0 3px rgba(217,119,69,.12);}
+    .form-group input.error,.form-group select.error{border-color:#f44336;}
+    .form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+    @media(max-width:500px){.form-row{grid-template-columns:1fr;}}
+    .checkbox-row{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:600;}
+    .checkbox-row input{width:auto;}
+    .modal-actions{display:flex;gap:10px;margin-top:20px;justify-content:flex-end;}
+
+    /* Confirm dialog */
+    .confirm-box{background:#fff;border-radius:16px;width:100%;max-width:380px;padding:28px;text-align:center;}
+    .confirm-box h4{font-family:'Playfair Display',serif;font-size:18px;margin:0 0 12px;}
+    .confirm-box p{font-size:14px;color:#666;margin-bottom:20px;}
+    .confirm-actions{display:flex;gap:10px;justify-content:center;}
+
+    .staff-banner{background:#FFF3E0;border:1.5px solid #FFB74D;border-radius:10px;padding:14px 20px;color:#E65100;font-weight:600;font-size:14px;margin-bottom:16px;display:none;}
+    .staff-banner.show{display:block;}
+
+    .toast-container{position:fixed;top:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px;}
+    .toast{background:#fff;border-radius:10px;padding:14px 20px;box-shadow:0 4px 20px rgba(0,0,0,.14);font-size:14px;font-weight:600;display:flex;align-items:center;gap:10px;min-width:260px;animation:slideInRight .3s ease;border-left:4px solid #D97745;}
+    .toast.success{border-left-color:#4CAF50;}
+    .toast.error{border-left-color:#f44336;}
+    @keyframes slideInRight{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <span>🚚 Giao hàng toàn quốc</span>
+    <span>📞 Hotline: 1800-GHP</span>
+    <span>🕐 Thứ 2 – Thứ 7: 8:00 – 17:30</span>
+  </div>
+  <div class="header-main">
+    <div class="header-inner">
+      <a href="../index.html" class="logo">
+        <span class="logo-icon">🎂</span>
+        <div><span class="logo-title">GHP</span><span class="logo-sub">Gia Hoà Phát</span></div>
+      </a>
+      <div class="header-actions">
+        <div id="authArea"></div>
+        <a href="../cart.html" class="cart-btn">🛒 <span id="cartCount" class="cart-badge">0</span></a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div style="max-width:1100px;margin:0 auto;padding:0 16px;">
+  <div class="staff-banner" id="staffBanner">⚠️ Đây là tài khoản nhân viên. Vui lòng đăng nhập tài khoản khách hàng.</div>
+</div>
+
+<div class="account-layout">
+  <aside class="account-sidebar">
+    <div class="sidebar-header">
+      <div class="avatar-circle" id="sidebarAvatar">?</div>
+      <div class="user-name" id="sidebarName">Đang tải...</div>
+      <div class="user-email" id="sidebarEmail"></div>
+    </div>
+    <div class="sidebar-section-label">Tài khoản của tôi</div>
+    <ul class="sidebar-menu">
+      <li><a href="profile.html"><span class="menu-icon">👤</span> Thông tin cá nhân</a></li>
+      <li><a href="change-password.html"><span class="menu-icon">🔑</span> Đổi mật khẩu</a></li>
+      <li><a href="addresses.html" class="active"><span class="menu-icon">📍</span> Địa chỉ giao hàng</a></li>
+      <li><a href="orders.html"><span class="menu-icon">📋</span> Đơn hàng của tôi</a></li>
+    </ul>
+  </aside>
+
+  <main class="account-card">
+    <div class="card-header">
+      <h2>📍 Địa chỉ giao hàng</h2>
+      <button class="btn-primary" id="addAddrBtn" onclick="openAddressModal(null)">+ Thêm địa chỉ mới</button>
+    </div>
+    <div class="limit-note" id="limitNote" style="display:none;">
+      ℹ️ Tối đa 5 địa chỉ giao hàng. Demo – Dữ liệu không được lưu vĩnh viễn.
+    </div>
+    <div id="addressList" class="address-list"></div>
+  </main>
+</div>
+
+<footer style="text-align:center;padding:28px 16px;font-size:12px;color:#999;margin-top:40px;border-top:1px solid #EDE5DB;">
+  © 2024 Gia Hoà Phát – Demo prototype.
+</footer>
+
+<!-- ── Address Modal ── -->
+<div class="modal-overlay hidden" id="addressModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeAddressModal()">✕</button>
+    <h3 id="modalTitle">Thêm địa chỉ mới</h3>
+    <form id="addressForm" novalidate>
+      <input type="hidden" id="editIndex" value="-1" />
+      <div class="form-row">
+        <div class="form-group">
+          <label for="addrName">Họ và tên <span style="color:#D97745">*</span></label>
+          <input type="text" id="addrName" placeholder="Người nhận" />
+        </div>
+        <div class="form-group">
+          <label for="addrPhone">Số điện thoại <span style="color:#D97745">*</span></label>
+          <input type="tel" id="addrPhone" placeholder="0xxxxxxxxx" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="addrStreet">Địa chỉ (số nhà + đường) <span style="color:#D97745">*</span></label>
+        <input type="text" id="addrStreet" placeholder="VD: 123 Nguyễn Trãi" />
+      </div>
+      <div class="form-row">
+        <div class="form-group">
+          <label for="addrWard">Phường/Xã <span style="color:#D97745">*</span></label>
+          <input type="text" id="addrWard" placeholder="VD: Phường 2" />
+        </div>
+        <div class="form-group">
+          <label for="addrCity">Thành phố/Tỉnh <span style="color:#D97745">*</span></label>
+          <select id="addrCity" onchange="updateDistrictOptions()">
+            <option value="">-- Chọn tỉnh/thành --</option>
+            <option value="TP. Hồ Chí Minh">TP. Hồ Chí Minh</option>
+            <option value="Hà Nội">Hà Nội</option>
+            <option value="Đà Nẵng">Đà Nẵng</option>
+            <option value="Cần Thơ">Cần Thơ</option>
+            <option value="Bình Dương">Bình Dương</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group">
+        <label for="addrDistrict">Quận/Huyện <span style="color:#D97745">*</span></label>
+        <select id="addrDistrict">
+          <option value="">-- Chọn quận/huyện --</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="checkbox-row">
+          <input type="checkbox" id="addrDefault" />
+          Đặt làm địa chỉ mặc định
+        </label>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" onclick="closeAddressModal()">Huỷ</button>
+        <button type="submit" class="btn-primary">Lưu địa chỉ</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- ── Confirm Delete Dialog ── -->
+<div class="modal-overlay hidden" id="confirmModal">
+  <div class="confirm-box">
+    <h4>Xóa địa chỉ</h4>
+    <p>Bạn có chắc muốn xóa địa chỉ này không?</p>
+    <div class="confirm-actions">
+      <button class="btn-secondary" onclick="closeConfirmModal()">Huỷ</button>
+      <button class="btn-danger" id="confirmDeleteBtn">Xóa</button>
+    </div>
+  </div>
+</div>
+
+<script src="../scripts/main.js" defer></script>
+<script>
+  const DISTRICTS = {
+    'TP. Hồ Chí Minh': ['Quận 1','Quận 2','Quận 3','Quận 4','Quận 5','Quận 6','Quận 7','Quận 8','Quận 9','Quận 10','Quận 11','Quận 12','Bình Thạnh','Gò Vấp','Phú Nhuận','Tân Bình','Tân Phú','Thủ Đức','Bình Chánh','Hóc Môn','Củ Chi','Nhà Bè','Cần Giờ'],
+    'Hà Nội': ['Ba Đình','Hoàn Kiếm','Tây Hồ','Long Biên','Cầu Giấy','Đống Đa','Hai Bà Trưng','Hoàng Mai','Thanh Xuân','Hà Đông','Nam Từ Liêm','Bắc Từ Liêm'],
+    'Đà Nẵng': ['Hải Châu','Thanh Khê','Sơn Trà','Ngũ Hành Sơn','Liên Chiểu','Cẩm Lệ','Hòa Vang'],
+    'Cần Thơ': ['Ninh Kiều','Bình Thủy','Cái Răng','Ô Môn','Thốt Nốt','Phong Điền','Cờ Đỏ','Vĩnh Thạnh','Thới Lai'],
+    'Bình Dương': ['Thủ Dầu Một','Dĩ An','Thuận An','Bến Cát','Tân Uyên','Phú Giáo','Bàu Bàng','Bắc Tân Uyên','Dầu Tiếng']
+  };
+
+  let addresses = [];
+  let currentUser = null;
+  let deleteIndex = -1;
+
+  document.addEventListener('DOMContentLoaded', () => {
+    const raw = sessionStorage.getItem('ghp_user');
+    if (!raw) { window.location.href = '../login.html'; return; }
+    currentUser = JSON.parse(raw);
+
+    if (currentUser.role !== 'customer') document.getElementById('staffBanner').classList.add('show');
+
+    const initials = getInitials(currentUser.name);
+    document.getElementById('sidebarAvatar').textContent = initials;
+    document.getElementById('sidebarName').textContent   = currentUser.name;
+    document.getElementById('sidebarEmail').textContent  = currentUser.email;
+
+    const authArea = document.getElementById('authArea');
+    if (authArea) {
+      authArea.innerHTML = `<span style="font-weight:600;font-size:14px;">👋 ${currentUser.name}</span>
+        <button onclick="sessionStorage.removeItem('ghp_user');window.location.href='../login.html'" style="margin-left:12px;background:none;border:1px solid #EDE5DB;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:13px;font-family:'Nunito',sans-serif;">Đăng xuất</button>`;
+    }
+    try { const cart = JSON.parse(localStorage.getItem('ghp_cart')||'[]'); document.getElementById('cartCount').textContent = cart.reduce((s,i)=>s+(i.qty||0),0); } catch(e){}
+
+    addresses = Array.isArray(currentUser.addresses) ? [...currentUser.addresses] : [
+      {id:1, name:currentUser.name, phone:currentUser.phone||'', address:'123 Nguyễn Trãi, Phường 2', ward:'Phường 2', district:'Quận 1', city:'TP. Hồ Chí Minh', isDefault:true}
+    ];
+    renderAddresses();
+
+    document.getElementById('addressForm').addEventListener('submit', e => { e.preventDefault(); saveAddress(); });
+    document.getElementById('confirmDeleteBtn').addEventListener('click', () => {
+      if (deleteIndex >= 0) {
+        const wasDefault = addresses[deleteIndex].isDefault;
+        addresses.splice(deleteIndex, 1);
+        if (wasDefault && addresses.length > 0) addresses[0].isDefault = true;
+        persistAddresses();
+        renderAddresses();
+        closeConfirmModal();
+        showToastLocal('Địa chỉ đã được xóa.', 'success');
+        deleteIndex = -1;
+      }
+    });
+  });
+
+  function getInitials(name) {
+    if (!name) return '?';
+    const parts = name.trim().split(/\s+/);
+    return parts.length >= 2 ? (parts[0][0]+parts[parts.length-1][0]).toUpperCase() : name[0].toUpperCase();
+  }
+
+  function renderAddresses() {
+    const list = document.getElementById('addressList');
+    const addBtn = document.getElementById('addAddrBtn');
+    const limitNote = document.getElementById('limitNote');
+
+    if (addresses.length >= 5) { addBtn.disabled = true; limitNote.style.display = 'block'; }
+    else { addBtn.disabled = false; limitNote.style.display = 'none'; }
+
+    if (addresses.length === 0) {
+      list.innerHTML = `<div class="empty-state"><div class="empty-icon">📭</div><p>Bạn chưa có địa chỉ giao hàng nào.</p></div>`;
+      return;
+    }
+
+    list.innerHTML = addresses.map((a, i) => `
+      <div class="address-card ${a.isDefault ? 'is-default' : ''}">
+        <div class="address-card-top">
+          <div>
+            <div class="address-name">${a.name}</div>
+            <div class="address-phone">📞 ${a.phone}</div>
+          </div>
+          ${a.isDefault ? '<span class="default-badge">✓ Mặc định</span>' : ''}
+        </div>
+        <div class="address-line">📍 ${a.address}, ${a.ward}, ${a.district}, ${a.city}</div>
+        <div class="address-actions">
+          <button class="btn-secondary" onclick="openAddressModal(${i})">✏️ Chỉnh sửa</button>
+          <button class="btn-danger" onclick="confirmDelete(${i})">🗑️ Xóa</button>
+          ${!a.isDefault ? `<button class="btn-link" onclick="setDefault(${i})">⭐ Đặt làm mặc định</button>` : ''}
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function openAddressModal(index) {
+    const form = document.getElementById('addressForm');
+    form.reset();
+    document.getElementById('editIndex').value = index === null ? -1 : index;
+    document.getElementById('modalTitle').textContent = index === null ? 'Thêm địa chỉ mới' : 'Chỉnh sửa địa chỉ';
+
+    if (index !== null && addresses[index]) {
+      const a = addresses[index];
+      document.getElementById('addrName').value  = a.name;
+      document.getElementById('addrPhone').value = a.phone;
+      document.getElementById('addrStreet').value = a.address;
+      document.getElementById('addrWard').value   = a.ward;
+      document.getElementById('addrCity').value   = a.city;
+      document.getElementById('addrDefault').checked = a.isDefault;
+      updateDistrictOptions();
+      setTimeout(() => { document.getElementById('addrDistrict').value = a.district; }, 50);
+    } else {
+      updateDistrictOptions();
+    }
+    document.getElementById('addressModal').classList.remove('hidden');
+  }
+
+  function closeAddressModal() { document.getElementById('addressModal').classList.add('hidden'); }
+
+  function updateDistrictOptions() {
+    const city = document.getElementById('addrCity').value;
+    const sel  = document.getElementById('addrDistrict');
+    sel.innerHTML = '<option value="">-- Chọn quận/huyện --</option>';
+    if (DISTRICTS[city]) {
+      DISTRICTS[city].forEach(d => { const o = document.createElement('option'); o.value = d; o.textContent = d; sel.appendChild(o); });
+    }
+  }
+
+  function saveAddress() {
+    const name     = document.getElementById('addrName').value.trim();
+    const phone    = document.getElementById('addrPhone').value.trim();
+    const street   = document.getElementById('addrStreet').value.trim();
+    const ward     = document.getElementById('addrWard').value.trim();
+    const city     = document.getElementById('addrCity').value;
+    const district = document.getElementById('addrDistrict').value;
+    const isDefault= document.getElementById('addrDefault').checked;
+    const idx      = parseInt(document.getElementById('editIndex').value);
+
+    if (!name || !phone || !street || !ward || !city || !district) {
+      showToastLocal('Vui lòng điền đầy đủ thông tin.', 'error'); return;
+    }
+    if (!/^0\d{9}$/.test(phone)) {
+      showToastLocal('Số điện thoại không hợp lệ.', 'error'); return;
+    }
+    if (idx === -1 && addresses.length >= 5) {
+      showToastLocal('Đã đạt tối đa 5 địa chỉ.', 'error'); return;
+    }
+
+    const newAddr = { id: Date.now(), name, phone, address:street, ward, district, city, isDefault };
+    if (isDefault) addresses.forEach(a => a.isDefault = false);
+
+    if (idx === -1) addresses.push(newAddr);
+    else addresses[idx] = newAddr;
+
+    if (!addresses.some(a => a.isDefault)) addresses[0].isDefault = true;
+
+    persistAddresses();
+    renderAddresses();
+    closeAddressModal();
+    showToastLocal(idx === -1 ? 'Địa chỉ đã được thêm ✓' : 'Địa chỉ đã được cập nhật ✓', 'success');
+  }
+
+  function setDefault(index) {
+    addresses.forEach((a,i) => a.isDefault = i === index);
+    persistAddresses();
+    renderAddresses();
+    showToastLocal('Đã đặt địa chỉ mặc định ✓', 'success');
+  }
+
+  function confirmDelete(index) {
+    deleteIndex = index;
+    document.getElementById('confirmModal').classList.remove('hidden');
+  }
+  function closeConfirmModal() { document.getElementById('confirmModal').classList.add('hidden'); }
+
+  function persistAddresses() {
+    currentUser.addresses = addresses;
+    sessionStorage.setItem('ghp_user', JSON.stringify(currentUser));
+  }
+
+  function showToastLocal(msg, type='success') {
+    if (typeof showToast === 'function') { showToast(msg, type); return; }
+    const c = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.textContent = msg;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), 3200);
+  }
+</script>
+</body>
+</html>

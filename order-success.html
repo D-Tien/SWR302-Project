@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đặt hàng thành công – Gia Hoa Phat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/main.css" />
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      background: linear-gradient(135deg, #FFF8F0 0%, #F0F5EF 100%);
+      font-family: 'Nunito', sans-serif; color: #332A25;
+      min-height: 100vh; display: flex; flex-direction: column;
+    }
+    main { flex: 1; display: flex; align-items: center; justify-content: center; padding: 40px 16px; }
+
+    /* Success card */
+    .success-card {
+      background: #fff; border-radius: 24px; padding: 48px 40px;
+      max-width: 600px; width: 100%; text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.10);
+      animation: slideUp 0.5s ease;
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    @media (max-width: 600px) {
+      .success-card { padding: 32px 20px; border-radius: 16px; }
+    }
+
+    /* Checkmark animation */
+    .check-circle {
+      width: 90px; height: 90px; border-radius: 50%;
+      background: linear-gradient(135deg, #789B75, #56805A);
+      display: flex; align-items: center; justify-content: center;
+      margin: 0 auto 24px;
+      animation: popIn 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.2s both;
+      box-shadow: 0 8px 32px rgba(120,155,117,0.4);
+    }
+    @keyframes popIn {
+      from { opacity: 0; transform: scale(0.4); }
+      to   { opacity: 1; transform: scale(1); }
+    }
+    .check-circle svg { width: 48px; height: 48px; }
+    .check-path {
+      stroke-dasharray: 60;
+      stroke-dashoffset: 60;
+      animation: drawCheck 0.5s ease 0.6s forwards;
+    }
+    @keyframes drawCheck {
+      to { stroke-dashoffset: 0; }
+    }
+
+    /* Title */
+    .success-title {
+      font-family: 'Playfair Display', serif; font-size: 1.8rem;
+      color: #332A25; margin: 0 0 8px; line-height: 1.3;
+    }
+    .success-sub { color: #888; font-size: 15px; margin-bottom: 28px; }
+
+    /* Order code */
+    .order-code-box {
+      background: #FFF8F0; border: 2px dashed #D97745; border-radius: 14px;
+      padding: 18px 24px; margin: 0 0 24px; display: inline-block; width: 100%;
+    }
+    .order-code-label { font-size: 13px; color: #888; margin-bottom: 6px; }
+    .order-code {
+      font-family: 'Playfair Display', serif; font-size: 1.5rem;
+      font-weight: 700; color: #D97745; letter-spacing: 2px;
+    }
+
+    /* Status badges */
+    .status-row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-bottom: 24px; }
+    .status-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 7px 16px; border-radius: 999px; font-size: 13px; font-weight: 700;
+    }
+    .badge-pending { background: #FFF3E0; color: #E65100; border: 1px solid #FFCC80; }
+    .badge-unpaid  { background: #F5F5F5; color: #616161; border: 1px solid #E0E0E0; }
+
+    /* Staff note */
+    .staff-note {
+      background: #F0F5EF; border-radius: 12px; padding: 14px 18px;
+      color: #4a6e47; font-size: 14px; line-height: 1.6; margin-bottom: 28px;
+    }
+
+    /* Buttons */
+    .success-actions { display: flex; gap: 14px; justify-content: center; flex-wrap: wrap; margin-bottom: 20px; }
+    .btn-orders, .btn-shop {
+      display: inline-block; padding: 13px 28px; border-radius: 12px;
+      font-size: 15px; font-weight: 800; text-decoration: none; cursor: pointer;
+      transition: all 0.2s; font-family: 'Nunito', sans-serif; border: none;
+    }
+    .btn-orders { background: #D97745; color: #fff; }
+    .btn-orders:hover { background: #c46535; transform: translateY(-2px); box-shadow: 0 6px 20px rgba(217,119,69,0.3); }
+    .btn-shop { background: #FFF8F0; color: #D97745; border: 2px solid #D97745; }
+    .btn-shop:hover { background: #FAEEE4; }
+
+    /* Demo note */
+    .demo-note {
+      font-size: 12px; color: #bbb; padding-top: 16px;
+      border-top: 1px solid #F0E8E0;
+    }
+
+    /* Header */
+    .success-header {
+      background: #fff; border-bottom: 1px solid #EDE5DB;
+      padding: 16px 24px; display: flex; align-items: center;
+      justify-content: space-between;
+    }
+    .success-logo { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #D97745; font-weight: 700; text-decoration: none; }
+
+    footer { text-align: center; padding: 24px 16px; font-size: 13px; color: #aaa; }
+  </style>
+</head>
+<body>
+
+<!-- Header -->
+<header class="success-header">
+  <a href="index.html" class="success-logo">🍰 Gia Hoa Phat</a>
+  <a href="catalog.html" style="font-size:13px;color:#D97745;font-weight:700;text-decoration:none;">← Tiếp tục mua sắm</a>
+</header>
+
+<main>
+  <div class="success-card">
+
+    <!-- Checkmark -->
+    <div class="check-circle">
+      <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <polyline class="check-path" points="10,25 20,35 38,16" stroke="white" stroke-width="4.5" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+
+    <h1 class="success-title">Đặt hàng thành công! 🎉</h1>
+    <p class="success-sub">Cảm ơn bạn đã mua hàng tại Gia Hoa Phat!</p>
+
+    <!-- Order code -->
+    <div class="order-code-box">
+      <div class="order-code-label">Mã đơn hàng</div>
+      <div class="order-code" id="display-order-id">GHP--------</div>
+    </div>
+
+    <!-- Status -->
+    <div class="status-row">
+      <span class="status-badge badge-pending">🕐 Chờ xác nhận (Pending)</span>
+      <span class="status-badge badge-unpaid">💵 Chưa thanh toán (Unpaid)</span>
+    </div>
+
+    <!-- Order summary (from order object) -->
+    <div id="order-detail-box" style="margin-bottom:24px;text-align:left;display:none;">
+      <div style="font-size:13px;color:#888;margin-bottom:10px;text-align:center;">Chi tiết đơn hàng</div>
+      <div id="order-items-preview" style="border:1px solid #EDE5DB;border-radius:12px;overflow:hidden;"></div>
+      <div style="display:flex;justify-content:space-between;padding:12px 16px;background:#FFF8F0;border-radius:0 0 12px 12px;border:1px solid #EDE5DB;border-top:none;">
+        <span style="font-weight:800;color:#332A25;">Tổng cộng</span>
+        <span style="font-weight:800;color:#D97745;font-size:16px;" id="order-total-preview">0 ₫</span>
+      </div>
+    </div>
+
+    <!-- Staff note -->
+    <div class="staff-note">
+      📞 Nhân viên sẽ liên hệ xác nhận đơn hàng của bạn trong thời gian sớm nhất (trong vòng 24 giờ làm việc).
+    </div>
+
+    <!-- Actions -->
+    <div class="success-actions">
+      <a href="account/orders.html" class="btn-orders">📦 Xem đơn hàng của tôi</a>
+      <a href="catalog.html" class="btn-shop">🛍 Tiếp tục mua sắm</a>
+    </div>
+
+    <!-- Demo note -->
+    <p class="demo-note">⚠️ Đây là giao dịch demo. Không phải đơn hàng thực tế.</p>
+
+  </div>
+</main>
+
+<footer>
+  © 2024 Gia Hoa Phat – Website Demo
+</footer>
+
+<script src="scripts/main.js" defer></script>
+<script>
+function fmt(n) { return n.toLocaleString('vi-VN') + ' ₫'; }
+
+function getOrderById(id) {
+  try {
+    const orders = JSON.parse(localStorage.getItem('ghp_orders') || '[]');
+    return orders.find(o => o.id === id) || null;
+  } catch { return null; }
+}
+
+function renderOrderDetail(order) {
+  if (!order) return;
+
+  // Update order ID display
+  document.getElementById('display-order-id').textContent = order.id;
+
+  // Reveal detail box
+  const box = document.getElementById('order-detail-box');
+  box.style.display = '';
+
+  // Items
+  const itemsHtml = (order.items || []).map(item => `
+    <div style="display:flex;justify-content:space-between;padding:10px 16px;border-bottom:1px solid #F5EDE3;font-size:13.5px;">
+      <span style="flex:1;color:#332A25;">${item.name}</span>
+      <span style="color:#888;margin-right:12px;">×${item.qty}</span>
+      <span style="font-weight:700;">${fmt(item.price * item.qty)}</span>
+    </div>`).join('');
+
+  document.getElementById('order-items-preview').innerHTML = itemsHtml;
+  document.getElementById('order-total-preview').textContent = fmt(order.total || 0);
+}
+
+function initSuccessPage() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+
+  if (id) {
+    document.getElementById('display-order-id').textContent = id;
+    const order = getOrderById(id);
+    if (order) {
+      renderOrderDetail(order);
+    }
+  }
+
+  if (typeof updateCartCount === 'function') updateCartCount();
+}
+
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', initSuccessPage);
+} else {
+  initSuccessPage();
+}
+</script>
+</body>
+</html>

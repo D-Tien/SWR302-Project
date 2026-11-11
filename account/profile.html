@@ -1,0 +1,418 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Thông tin cá nhân – Gia Hoa Phat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles/main.css" />
+  <style>
+    /* ── Account layout ── */
+    .account-layout {
+      display: grid;
+      grid-template-columns: 260px 1fr;
+      gap: 24px;
+      max-width: 1100px;
+      margin: 32px auto;
+      padding: 0 16px;
+      align-items: start;
+    }
+    @media (max-width: 768px) {
+      .account-layout { grid-template-columns: 1fr; }
+    }
+
+    /* ── Sidebar ── */
+    .account-sidebar {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #EDE5DB;
+      overflow: hidden;
+      box-shadow: 0 2px 8px rgba(51,42,37,.06);
+    }
+    .sidebar-header {
+      background: var(--primary, #D97745);
+      color: #fff;
+      padding: 20px 20px 16px;
+    }
+    .sidebar-header .avatar-circle {
+      width: 56px; height: 56px;
+      border-radius: 50%;
+      background: rgba(255,255,255,.25);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 22px; font-weight: 700; color: #fff;
+      margin-bottom: 10px;
+    }
+    .sidebar-header .user-name { font-weight: 700; font-size: 15px; }
+    .sidebar-header .user-email { font-size: 12px; opacity: .85; }
+    .sidebar-section-label {
+      font-size: 11px; font-weight: 700; text-transform: uppercase;
+      letter-spacing: .08em; color: #999; padding: 14px 20px 6px;
+    }
+    .sidebar-menu { list-style: none; padding: 0 0 12px; margin: 0; }
+    .sidebar-menu li a {
+      display: flex; align-items: center; gap: 10px;
+      padding: 11px 20px; font-size: 14px; font-weight: 600;
+      color: #332A25; text-decoration: none; transition: background .15s, color .15s;
+    }
+    .sidebar-menu li a:hover { background: #FFF8F0; color: #D97745; }
+    .sidebar-menu li a.active { background: #FFF3EA; color: #D97745; border-left: 3px solid #D97745; }
+    .sidebar-menu li a .menu-icon { font-size: 16px; width: 20px; text-align: center; }
+
+    /* ── Main card ── */
+    .account-card {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #EDE5DB;
+      box-shadow: 0 2px 8px rgba(51,42,37,.06);
+      padding: 32px;
+    }
+    .account-card h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 22px; color: #332A25;
+      margin: 0 0 24px; padding-bottom: 16px;
+      border-bottom: 2px solid #EDE5DB;
+    }
+
+    /* ── Profile avatar ── */
+    .profile-top {
+      display: flex; align-items: center; gap: 20px; margin-bottom: 28px;
+    }
+    .profile-avatar {
+      width: 80px; height: 80px; border-radius: 50%;
+      background: linear-gradient(135deg, #D97745, #c4612d);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; font-weight: 800; color: #fff;
+      flex-shrink: 0;
+    }
+    .profile-avatar-info .name { font-size: 18px; font-weight: 700; color: #332A25; }
+    .profile-avatar-info .member-since { font-size: 13px; color: #888; margin-top: 4px; }
+
+    /* ── View mode ── */
+    .info-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 20px 32px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 600px) { .info-grid { grid-template-columns: 1fr; } }
+    .info-item label {
+      display: block; font-size: 12px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: .07em;
+      color: #999; margin-bottom: 4px;
+    }
+    .info-item .info-value {
+      font-size: 15px; font-weight: 600; color: #332A25;
+    }
+    .verified-badge {
+      display: inline-flex; align-items: center; gap: 4px;
+      font-size: 12px; font-weight: 600; padding: 2px 8px;
+      border-radius: 20px;
+    }
+    .verified-badge.verified { background: #E6F4EA; color: #2E7D32; }
+    .verified-badge.unverified { background: #FFF3E0; color: #E65100; }
+
+    /* ── Edit form ── */
+    .edit-form { display: none; }
+    .edit-form.active { display: block; }
+    .view-mode { display: block; }
+    .view-mode.hidden { display: none; }
+
+    .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    @media (max-width: 600px) { .form-row { grid-template-columns: 1fr; } }
+    .form-group { margin-bottom: 16px; }
+    .form-group label {
+      display: block; font-size: 13px; font-weight: 700; color: #332A25; margin-bottom: 6px;
+    }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: 10px 14px; border-radius: 8px;
+      border: 1.5px solid #EDE5DB; font-size: 14px; font-family: 'Nunito', sans-serif;
+      color: #332A25; background: #fff; transition: border-color .2s, box-shadow .2s;
+      box-sizing: border-box;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+      outline: none; border-color: #D97745; box-shadow: 0 0 0 3px rgba(217,119,69,.12);
+    }
+    .form-group input[disabled], .form-group input[readonly] {
+      background: #F9F5F1; color: #888; cursor: not-allowed;
+    }
+    .form-hint { font-size: 12px; color: #999; margin-top: 4px; }
+
+    .btn-primary {
+      background: #D97745; color: #fff; border: none; border-radius: 8px;
+      padding: 11px 28px; font-size: 14px; font-weight: 700;
+      font-family: 'Nunito', sans-serif; cursor: pointer; transition: background .2s;
+    }
+    .btn-primary:hover { background: #c4612d; }
+    .btn-secondary {
+      background: #fff; color: #332A25; border: 1.5px solid #EDE5DB; border-radius: 8px;
+      padding: 11px 28px; font-size: 14px; font-weight: 700;
+      font-family: 'Nunito', sans-serif; cursor: pointer; transition: background .2s;
+      margin-right: 10px;
+    }
+    .btn-secondary:hover { background: #FFF8F0; }
+    .btn-outline {
+      background: #fff; color: #D97745; border: 1.5px solid #D97745; border-radius: 8px;
+      padding: 11px 28px; font-size: 14px; font-weight: 700;
+      font-family: 'Nunito', sans-serif; cursor: pointer; transition: all .2s;
+    }
+    .btn-outline:hover { background: #D97745; color: #fff; }
+
+    /* ── Staff banner ── */
+    .staff-banner {
+      background: #FFF3E0; border: 1.5px solid #FFB74D; border-radius: 10px;
+      padding: 14px 20px; color: #E65100; font-weight: 600; font-size: 14px;
+      margin-bottom: 20px; display: none;
+    }
+    .staff-banner.show { display: block; }
+
+    /* ── Toast ── */
+    .toast-container {
+      position: fixed; top: 24px; right: 24px; z-index: 9999;
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .toast {
+      background: #fff; border-radius: 10px; padding: 14px 20px;
+      box-shadow: 0 4px 20px rgba(0,0,0,.14); font-size: 14px; font-weight: 600;
+      display: flex; align-items: center; gap: 10px; min-width: 260px;
+      animation: slideInRight .3s ease;
+      border-left: 4px solid #D97745;
+    }
+    .toast.success { border-left-color: #4CAF50; }
+    .toast.error   { border-left-color: #f44336; }
+    @keyframes slideInRight { from { opacity:0; transform:translateX(40px); } to { opacity:1; transform:none; } }
+  </style>
+</head>
+<body>
+
+<!-- ── Header ── -->
+<header class="site-header" id="siteHeader">
+  <div class="header-top">
+    <div class="container">
+      <span>🚚 Giao hàng toàn quốc</span>
+      <span>📞 Hotline: 1800-GHP</span>
+      <span>🕐 Thứ 2 – Thứ 7: 8:00 – 17:30</span>
+    </div>
+  </div>
+  <div class="header-main">
+    <div class="container header-inner">
+      <a href="../index.html" class="logo">
+        <span class="logo-icon">🎂</span>
+        <div><span class="logo-title">GHP</span><span class="logo-sub">Gia Hoà Phát</span></div>
+      </a>
+      <div class="header-actions">
+        <div id="authArea" class="auth-area"></div>
+        <a href="../cart.html" class="cart-btn">
+          🛒 <span id="cartCount" class="cart-badge">0</span>
+        </a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<!-- ── Staff banner ── -->
+<div class="container">
+  <div class="staff-banner" id="staffBanner">
+    ⚠️ Đây là tài khoản nhân viên. Vui lòng đăng nhập tài khoản khách hàng để sử dụng tính năng này.
+  </div>
+</div>
+
+<!-- ── Main layout ── -->
+<div class="account-layout">
+  <!-- Sidebar -->
+  <aside class="account-sidebar">
+    <div class="sidebar-header">
+      <div class="avatar-circle" id="sidebarAvatar">?</div>
+      <div class="user-name" id="sidebarName">Đang tải...</div>
+      <div class="user-email" id="sidebarEmail"></div>
+    </div>
+    <div class="sidebar-section-label">Tài khoản của tôi</div>
+    <ul class="sidebar-menu">
+      <li><a href="profile.html" class="active"><span class="menu-icon">👤</span> Thông tin cá nhân</a></li>
+      <li><a href="change-password.html"><span class="menu-icon">🔑</span> Đổi mật khẩu</a></li>
+      <li><a href="addresses.html"><span class="menu-icon">📍</span> Địa chỉ giao hàng</a></li>
+      <li><a href="orders.html"><span class="menu-icon">📋</span> Đơn hàng của tôi</a></li>
+    </ul>
+  </aside>
+
+  <!-- Main content -->
+  <main class="account-card">
+    <h2>Thông tin cá nhân</h2>
+
+    <!-- Profile top -->
+    <div class="profile-top">
+      <div class="profile-avatar" id="profileAvatar">?</div>
+      <div class="profile-avatar-info">
+        <div class="name" id="displayName">Đang tải...</div>
+        <div class="member-since" id="memberSince"></div>
+      </div>
+    </div>
+
+    <!-- VIEW MODE -->
+    <div class="view-mode" id="viewMode">
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Họ và tên</label>
+          <div class="info-value" id="infoName">–</div>
+        </div>
+        <div class="info-item">
+          <label>Email</label>
+          <div class="info-value">
+            <span id="infoEmail">–</span>
+            <span class="verified-badge verified" id="emailBadge">✓ Đã xác minh</span>
+          </div>
+        </div>
+        <div class="info-item">
+          <label>Số điện thoại</label>
+          <div class="info-value" id="infoPhone">–</div>
+        </div>
+        <div class="info-item">
+          <label>Vai trò</label>
+          <div class="info-value" id="infoRole">–</div>
+        </div>
+      </div>
+      <button class="btn-outline" onclick="switchToEdit()">✏️ Chỉnh sửa</button>
+    </div>
+
+    <!-- EDIT MODE -->
+    <div class="edit-form" id="editForm">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="editName">Họ và tên <span style="color:#D97745">*</span></label>
+          <input type="text" id="editName" placeholder="Nhập họ và tên" />
+        </div>
+        <div class="form-group">
+          <label for="editPhone">Số điện thoại</label>
+          <input type="tel" id="editPhone" placeholder="0xxxxxxxxx" />
+        </div>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="editEmail" disabled />
+        <div class="form-hint">Email không thể thay đổi.</div>
+      </div>
+      <div style="margin-top:8px;">
+        <button class="btn-secondary" onclick="cancelEdit()">Huỷ</button>
+        <button class="btn-primary" onclick="saveProfile()">💾 Lưu thay đổi</button>
+      </div>
+    </div>
+  </main>
+</div>
+
+<footer style="text-align:center;padding:28px 16px;font-size:12px;color:#999;margin-top:40px;border-top:1px solid #EDE5DB;">
+  © 2024 Gia Hoà Phát – Demo prototype. Dữ liệu không được lưu vĩnh viễn.
+</footer>
+
+<script src="../scripts/main.js" defer></script>
+<script>
+  // ── Auth guard ──
+  document.addEventListener('DOMContentLoaded', () => {
+    const raw = sessionStorage.getItem('ghp_user');
+    if (!raw) { window.location.href = '../login.html'; return; }
+
+    const user = JSON.parse(raw);
+
+    // Staff banner
+    if (user.role !== 'customer') {
+      document.getElementById('staffBanner').classList.add('show');
+    }
+
+    // Header auth area
+    const authArea = document.getElementById('authArea');
+    if (authArea) {
+      authArea.innerHTML = `
+        <span style="font-weight:600;color:#332A25;font-size:14px;">👋 ${user.name}</span>
+        <button onclick="logoutUser()" style="margin-left:12px;background:none;border:1px solid #EDE5DB;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:13px;font-family:'Nunito',sans-serif;">Đăng xuất</button>
+      `;
+    }
+
+    // Cart count
+    try {
+      const cart = JSON.parse(localStorage.getItem('ghp_cart') || '[]');
+      const total = cart.reduce((s, i) => s + (i.qty || 0), 0);
+      const badge = document.getElementById('cartCount');
+      if (badge) badge.textContent = total;
+    } catch(e){}
+
+    // Sidebar
+    const initials = getInitials(user.name);
+    document.getElementById('sidebarAvatar').textContent = initials;
+    document.getElementById('sidebarName').textContent = user.name;
+    document.getElementById('sidebarEmail').textContent = user.email;
+
+    // Profile avatar
+    document.getElementById('profileAvatar').textContent = initials;
+    document.getElementById('displayName').textContent = user.name;
+    document.getElementById('memberSince').textContent = 'Thành viên từ tháng 10, 2024';
+
+    // View mode
+    document.getElementById('infoName').textContent = user.name || '–';
+    document.getElementById('infoEmail').textContent = user.email || '–';
+    document.getElementById('infoPhone').textContent = user.phone || '–';
+    const roleMap = { customer:'Khách hàng', sales_staff:'Nhân viên kinh doanh', inventory_staff:'Nhân viên kho', manager:'Quản lý', administrator:'Quản trị viên' };
+    document.getElementById('infoRole').textContent = roleMap[user.role] || user.role || '–';
+
+    // Edit form prefill
+    document.getElementById('editName').value = user.name || '';
+    document.getElementById('editPhone').value = user.phone || '';
+    document.getElementById('editEmail').value = user.email || '';
+  });
+
+  function getInitials(name) {
+    if (!name) return '?';
+    const parts = name.trim().split(/\s+/);
+    return parts.length >= 2 ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase() : name[0].toUpperCase();
+  }
+
+  function switchToEdit() {
+    document.getElementById('viewMode').classList.add('hidden');
+    document.getElementById('editForm').classList.add('active');
+  }
+
+  function cancelEdit() {
+    document.getElementById('editForm').classList.remove('active');
+    document.getElementById('viewMode').classList.remove('hidden');
+  }
+
+  function saveProfile() {
+    const name  = document.getElementById('editName').value.trim();
+    const phone = document.getElementById('editPhone').value.trim();
+    if (!name) { showToastLocal('Vui lòng nhập họ và tên.', 'error'); return; }
+
+    const raw  = sessionStorage.getItem('ghp_user');
+    const user = JSON.parse(raw);
+    user.name  = name;
+    user.phone = phone;
+    sessionStorage.setItem('ghp_user', JSON.stringify(user));
+
+    // Update UI
+    document.getElementById('infoName').textContent  = name;
+    document.getElementById('infoPhone').textContent = phone || '–';
+    document.getElementById('displayName').textContent = name;
+    document.getElementById('sidebarName').textContent = name;
+    document.getElementById('profileAvatar').textContent = getInitials(name);
+    document.getElementById('sidebarAvatar').textContent  = getInitials(name);
+
+    cancelEdit();
+    showToastLocal('Thông tin đã được cập nhật ✓', 'success');
+  }
+
+  function logoutUser() {
+    sessionStorage.removeItem('ghp_user');
+    window.location.href = '../login.html';
+  }
+
+  function showToastLocal(msg, type = 'success') {
+    // Try shared showToast first (from main.js)
+    if (typeof showToast === 'function') { showToast(msg, type); return; }
+    const c = document.getElementById('toastContainer');
+    const t = document.createElement('div');
+    t.className = `toast ${type}`;
+    t.textContent = msg;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), 3200);
+  }
+</script>
+</body>
+</html>

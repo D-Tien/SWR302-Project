@@ -1,0 +1,1428 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quản lý Tồn kho – GHP Admin</title>
+  <link rel="stylesheet" href="../styles/main.css" />
+  <link rel="stylesheet" href="admin.css" />
+  <style>
+    /* ── Disclaimer Banner ── */
+    .disclaimer-banner {
+      background: #FFFBEB;
+      border: 1px solid #FCD34D;
+      border-left: 5px solid #F59E0B;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-bottom: 24px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: #92400E;
+      font-size: 13.5px;
+      font-weight: 600;
+      box-shadow: 0 1px 3px rgba(245, 158, 11, 0.08);
+    }
+    .disclaimer-banner .banner-icon {
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    /* ── Summary Cards ── */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .summary-card {
+      background: #fff;
+      border: 1px solid #EDE5DB;
+      border-radius: 12px;
+      padding: 18px 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.03);
+    }
+    .summary-card.alert-card {
+      border-color: #FECACA;
+      background: #FEF2F2;
+    }
+    .summary-title {
+      font-size: 12px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: #8A7A70;
+    }
+    .summary-card.alert-card .summary-title {
+      color: #991B1B;
+    }
+    .summary-value {
+      font-size: 26px;
+      font-weight: 800;
+      color: #332A25;
+      font-family: 'Playfair Display', serif;
+    }
+    .summary-card.alert-card .summary-value {
+      color: #DC2626;
+    }
+    .low-stock-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin-top: 6px;
+    }
+    .low-stock-chip {
+      background: #FEE2E2;
+      color: #991B1B;
+      border: 1px solid #FCA5A5;
+      border-radius: 16px;
+      padding: 2px 10px;
+      font-size: 11px;
+      font-weight: 600;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .low-stock-chip:hover {
+      background: #FECACA;
+    }
+
+    /* ── Filters Row ── */
+    .filters-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      flex-wrap: wrap;
+      background: #fff;
+      padding: 16px 20px;
+      border-radius: 12px;
+      border: 1px solid #EDE5DB;
+      margin-bottom: 20px;
+    }
+    .filters-row input, .filters-row select {
+      height: 38px;
+      padding: 0 12px;
+      border: 1px solid #EDE5DB;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 13px;
+      color: #332A25;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+    .filters-row input:focus, .filters-row select:focus {
+      border-color: #D97745;
+    }
+    .filters-row input[type=text] {
+      flex: 1;
+      min-width: 220px;
+    }
+    .filter-checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #92400E;
+      background: #FFFBEB;
+      padding: 8px 14px;
+      border-radius: 8px;
+      border: 1px solid #FDE68A;
+      cursor: pointer;
+      user-select: none;
+    }
+    .filter-checkbox-label input {
+      accent-color: #D97745;
+      width: 16px;
+      height: 16px;
+      cursor: pointer;
+    }
+
+    /* ── Table Styles ── */
+    .admin-table-wrap {
+      background: #fff;
+      border-radius: 12px;
+      border: 1px solid #EDE5DB;
+      overflow: hidden;
+      margin-bottom: 32px;
+    }
+    .admin-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+    .admin-table thead th {
+      background: #F8F5F0;
+      padding: 12px 14px;
+      text-align: left;
+      font-weight: 700;
+      color: #332A25;
+      border-bottom: 1px solid #EDE5DB;
+      white-space: nowrap;
+    }
+    .admin-table tbody tr {
+      border-bottom: 1px solid #F3EDE5;
+      transition: background 0.15s;
+    }
+    .admin-table tbody tr:last-child {
+      border-bottom: none;
+    }
+    .admin-table tbody tr:hover {
+      background: #FEFAF6;
+    }
+    .admin-table td {
+      padding: 12px 14px;
+      vertical-align: middle;
+    }
+
+    /* ── Badges ── */
+    .badge-stock-ok {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #D1FAE5;
+      color: #065F46;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-stock-low {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #FEF3C7;
+      color: #92400E;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+    .badge-stock-out {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #FEE2E2;
+      color: #991B1B;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: 700;
+    }
+
+    /* ── Action button ── */
+    .btn-adjust {
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      border: 1px solid #BFDBFE;
+      background: #EFF6FF;
+      color: #1D4ED8;
+      transition: all 0.2s;
+    }
+    .btn-adjust:hover {
+      background: #DBEAFE;
+      border-color: #93C5FD;
+    }
+
+    /* ── History Table Section ── */
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+    .section-title {
+      font-size: 17px;
+      font-weight: 700;
+      color: #332A25;
+    }
+    .section-subtitle {
+      font-size: 12px;
+      color: #8A7A70;
+      margin-top: 3px;
+    }
+
+    /* ── Change badges in history ── */
+    .change-plus {
+      color: #059669;
+      font-weight: 700;
+    }
+    .change-minus {
+      color: #DC2626;
+      font-weight: 700;
+    }
+    .change-zero {
+      color: #6B7280;
+      font-weight: 600;
+    }
+
+    /* ── Modal ── */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.48);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-backdrop.open {
+      display: flex;
+    }
+    .modal-box {
+      background: #fff;
+      border-radius: 16px;
+      width: 580px;
+      max-width: 95vw;
+      max-height: 92vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+      animation: modalSlideUp 0.25s ease;
+    }
+    @keyframes modalSlideUp {
+      from { transform: translateY(25px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    .modal-header {
+      padding: 20px 24px 16px;
+      border-bottom: 1px solid #EDE5DB;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      position: sticky;
+      top: 0;
+      background: #fff;
+      z-index: 2;
+    }
+    .modal-title {
+      font-size: 16px;
+      font-weight: 700;
+      color: #332A25;
+    }
+    .modal-close {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      border: none;
+      background: #F3EDE5;
+      cursor: pointer;
+      font-size: 18px;
+      color: #8A7A70;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: background 0.15s;
+    }
+    .modal-close:hover {
+      background: #EDE5DB;
+    }
+    .modal-body {
+      padding: 24px;
+    }
+    .modal-footer {
+      padding: 16px 24px;
+      border-top: 1px solid #EDE5DB;
+      display: flex;
+      justify-content: flex-end;
+      gap: 12px;
+      position: sticky;
+      bottom: 0;
+      background: #fff;
+    }
+
+    /* Modal Form Elements */
+    .product-info-banner {
+      background: #F8F5F0;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-bottom: 20px;
+      border: 1px solid #EDE5DB;
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 10px;
+      text-align: center;
+    }
+    .p-info-item .label {
+      font-size: 11px;
+      color: #8A7A70;
+      font-weight: 600;
+      text-transform: uppercase;
+    }
+    .p-info-item .val {
+      font-size: 18px;
+      font-weight: 700;
+      color: #332A25;
+      margin-top: 2px;
+    }
+
+    .form-group {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      margin-bottom: 18px;
+    }
+    .form-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #332A25;
+    }
+    .form-label .req {
+      color: #EF4444;
+    }
+    .form-control {
+      height: 40px;
+      padding: 0 12px;
+      border: 1px solid #EDE5DB;
+      border-radius: 8px;
+      font-family: inherit;
+      font-size: 13.5px;
+      color: #332A25;
+      background: #fff;
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+      box-sizing: border-box;
+    }
+    textarea.form-control {
+      height: auto;
+      padding: 10px 12px;
+      resize: vertical;
+    }
+    .form-control:focus {
+      border-color: #D97745;
+    }
+    .form-control.error {
+      border-color: #EF4444;
+    }
+    .error-msg {
+      font-size: 11px;
+      color: #EF4444;
+    }
+
+    /* Calculated preview box */
+    .preview-box {
+      background: #FEFAF6;
+      border: 1.5px dashed #D97745;
+      border-radius: 10px;
+      padding: 14px 16px;
+      margin-top: 8px;
+      margin-bottom: 4px;
+    }
+    .preview-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 13px;
+      margin-bottom: 6px;
+    }
+    .preview-row:last-child {
+      margin-bottom: 0;
+      padding-top: 6px;
+      border-top: 1px dashed #EDE5DB;
+    }
+    .preview-val {
+      font-weight: 800;
+      font-size: 14px;
+      color: #D97745;
+    }
+
+    /* ── Pagination ── */
+    .pagination-row {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 16px;
+      font-size: 13px;
+      color: #8A7A70;
+      border-top: 1px solid #EDE5DB;
+    }
+    .pagination-btns {
+      display: flex;
+      gap: 6px;
+    }
+    .pg-btn {
+      min-width: 32px;
+      height: 32px;
+      padding: 0 8px;
+      border-radius: 6px;
+      border: 1px solid #EDE5DB;
+      background: #fff;
+      cursor: pointer;
+      font-size: 13px;
+      font-weight: 600;
+      color: #332A25;
+      transition: 0.2s;
+    }
+    .pg-btn:hover:not(:disabled) {
+      background: #F8F5F0;
+    }
+    .pg-btn.active {
+      background: #D97745;
+      color: #fff;
+      border-color: #D97745;
+    }
+    .pg-btn:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    /* ── Toast ── */
+    #toast-container {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .toast-item {
+      padding: 12px 18px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 600;
+      box-shadow: 0 4px 20px rgba(0,0,0,0.18);
+      animation: fadeIn 0.3s ease;
+      color: #fff;
+      max-width: 340px;
+    }
+    .toast-item.success { background: #065F46; }
+    .toast-item.error   { background: #DC2626; }
+    .toast-item.warning { background: #92400E; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ── 403 Page ── */
+    .page-403 {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 70vh;
+      gap: 16px;
+      color: #8A7A70;
+      text-align: center;
+      padding: 20px;
+    }
+    .page-403 .icon-403 { font-size: 60px; }
+    .page-403 h2 { font-size: 22px; color: #332A25; }
+    .btn-quick-login {
+      margin-top: 10px;
+      background: #D97745;
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════
+     AUTH GATE
+══════════════════════════════════════════ -->
+<div id="page-403" class="page-403" style="display:none">
+  <div class="icon-403">🚫</div>
+  <h2>403 – Không có quyền truy cập</h2>
+  <p>Trang này chỉ dành cho <strong>Nhân viên Kho</strong> (<code>inventory_staff</code>).</p>
+  <div>
+    <button class="btn-quick-login" onclick="quickLoginInventory()">Đăng nhập Demo: Lê Thị Hoa (NV Kho)</button>
+  </div>
+  <a href="../login.html" style="color:#D97745;font-weight:700;margin-top:8px;">← Về trang đăng nhập chính</a>
+</div>
+
+<!-- ══════════════════════════════════════════
+     ADMIN LAYOUT
+══════════════════════════════════════════ -->
+<div id="app" class="admin-layout" style="display:none">
+
+  <!-- SIDEBAR -->
+  <aside class="admin-sidebar">
+    <div class="logo">
+      <div class="logo-brand">GHP</div>
+      <div class="logo-sub">Back-Office Admin</div>
+    </div>
+    <nav style="padding:16px 0; flex:1;">
+      <div class="nav-section-title">Nhân viên Kho</div>
+      <a href="products.html" class="nav-item">
+        <span>📦</span><span>Sản phẩm &amp; Danh mục</span>
+      </a>
+      <a href="inventory.html" class="nav-item active">
+        <span>📊</span><span>Quản lý Tồn kho</span>
+      </a>
+    </nav>
+    <div style="padding:16px 20px; border-top:1px solid rgba(255,255,255,.1);">
+      <div style="font-size:11px;color:rgba(255,255,255,.4);margin-bottom:6px;">ĐĂNG NHẬP</div>
+      <div id="sidebar-user" style="font-size:13px;color:#fff;font-weight:600;"></div>
+      <button onclick="doLogout()" style="margin-top:8px;background:rgba(255,255,255,.1);border:none;color:rgba(255,255,255,.7);padding:6px 12px;border-radius:6px;cursor:pointer;font-size:12px;width:100%;">Đăng xuất</button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="admin-content" style="margin-left:260px; padding:0; flex:1;">
+    <!-- TOP BAR -->
+    <div class="admin-topbar">
+      <div class="admin-breadcrumb">
+        <span>Quản trị Kho</span>
+        <span class="sep">/</span>
+        <span class="current">Quản lý Tồn kho Online</span>
+      </div>
+      <div class="admin-topbar-right">
+        <span id="role-badge" class="badge-stock-ok" style="font-size:11px;">NV Kho</span>
+        <span id="topbar-user" style="font-size:13px;font-weight:700;color:#332A25;"></span>
+      </div>
+    </div>
+
+    <div style="padding:28px;">
+
+      <!-- DISCLAIMER BANNER -->
+      <div class="disclaimer-banner">
+        <span class="banner-icon">⚠</span>
+        <div>
+          <strong>Lưu ý quan trọng:</strong> Tồn kho online không tự động đồng bộ với tồn kho cửa hàng vật lý. Điều chỉnh thủ công bởi nhân viên kho.
+        </div>
+      </div>
+
+      <!-- LOW STOCK SUMMARY CARD -->
+      <div class="summary-grid">
+        <div class="summary-card alert-card" id="card-low-stock">
+          <div class="summary-title">⚠ Cảnh báo tồn kho</div>
+          <div class="summary-value" id="low-stock-count-text">0 sản phẩm sắp hết hàng</div>
+          <div style="font-size:12px;color:#991B1B;" id="low-stock-subtext">Cần nhập thêm hoặc kiểm tra số lượng thực tế:</div>
+          <div class="low-stock-chips" id="low-stock-chip-list"></div>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-title">Tổng sản phẩm quản lý</div>
+          <div class="summary-value" id="total-products-count">20</div>
+          <div style="font-size:12px;color:#8A7A70;">Bao gồm cả mặt hàng đang hoạt động và tạm ngừng</div>
+        </div>
+
+        <div class="summary-card">
+          <div class="summary-title">Mặt hàng hết hàng (0 tồn)</div>
+          <div class="summary-value" id="out-of-stock-count" style="color:#DC2626;">0</div>
+          <div style="font-size:12px;color:#8A7A70;">Không còn sản phẩm để bán trên website</div>
+        </div>
+      </div>
+
+      <!-- ═══ INVENTORY SECTION ═══ -->
+      <div class="section-header">
+        <div>
+          <div class="section-title">Danh sách Tồn kho Online</div>
+          <div class="section-subtitle">Theo dõi số lượng tồn thực tế, số lượng đã đặt giữ theo đơn hàng, và số lượng khả dụng</div>
+        </div>
+      </div>
+
+      <!-- Filters Row -->
+      <div class="filters-row">
+        <input type="text" id="inv-search" placeholder="🔍 Tìm kiếm theo mã SP, tên sản phẩm..." oninput="renderInventory()" />
+        <select id="inv-cat-filter" onchange="renderInventory()">
+          <option value="">Tất cả danh mục</option>
+        </select>
+        <label class="filter-checkbox-label">
+          <input type="checkbox" id="inv-low-only" onchange="renderInventory()" />
+          <span>Chỉ hiển thị hàng sắp hết</span>
+        </label>
+      </div>
+
+      <!-- Inventory Table -->
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Mã SP</th>
+              <th>Tên sản phẩm</th>
+              <th>Danh mục</th>
+              <th style="text-align:right;">Tồn kho online</th>
+              <th style="text-align:right;">Đã đặt giữ</th>
+              <th style="text-align:right;">Có thể bán</th>
+              <th style="text-align:center;">Mức thấp</th>
+              <th style="text-align:center;">Thao tác</th>
+            </tr>
+          </thead>
+          <tbody id="inv-tbody"></tbody>
+        </table>
+        <div class="pagination-row">
+          <span id="inv-paging-info"></span>
+          <div class="pagination-btns" id="inv-paging-btns"></div>
+        </div>
+      </div>
+
+      <!-- ═══ ADJUSTMENT HISTORY SECTION ═══ -->
+      <div class="section-header" style="margin-top:16px;">
+        <div>
+          <div class="section-title">Lịch sử Điều chỉnh Tồn kho</div>
+          <div class="section-subtitle">
+            Lịch sử điều chỉnh chỉ áp dụng cho tồn kho online. Nhân viên: <span id="history-staff-name" style="font-weight:700;color:#332A25;">Lê Thị Hoa</span> | Thời gian ghi nhận tự động.
+          </div>
+        </div>
+        <div style="display:flex;gap:10px;align-items:center;">
+          <input type="text" id="history-search" class="form-control" style="width:240px;height:36px;font-size:12.5px;"
+            placeholder="🔍 Lọc theo tên sản phẩm..." oninput="renderHistory()" />
+        </div>
+      </div>
+
+      <div class="admin-table-wrap">
+        <table class="admin-table">
+          <thead>
+            <tr>
+              <th>Thời gian</th>
+              <th>Nhân viên</th>
+              <th>Sản phẩm</th>
+              <th>Loại điều chỉnh</th>
+              <th style="text-align:right;">Trước</th>
+              <th style="text-align:right;">Sau</th>
+              <th style="text-align:center;">Thay đổi</th>
+              <th>Lý do</th>
+            </tr>
+          </thead>
+          <tbody id="history-tbody"></tbody>
+        </table>
+        <div class="pagination-row">
+          <span id="history-paging-info"></span>
+          <div class="pagination-btns" id="history-paging-btns"></div>
+        </div>
+      </div>
+
+    </div><!-- /padding -->
+  </main>
+</div><!-- /admin-layout -->
+
+<!-- ══════════════════════════════════════════
+     ADJUSTMENT MODAL
+══════════════════════════════════════════ -->
+<div class="modal-backdrop" id="modal-adjust">
+  <div class="modal-box">
+    <div class="modal-header">
+      <span class="modal-title">Điều chỉnh Tồn kho Sản phẩm</span>
+      <button class="modal-close" onclick="closeAdjustModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Product Quick Info Banner -->
+      <div style="margin-bottom:12px;">
+        <div style="font-size:11px;font-weight:700;color:#8A7A70;text-transform:uppercase;" id="m-prod-code">GHP-001</div>
+        <div style="font-size:16px;font-weight:700;color:#332A25;" id="m-prod-name">Tên sản phẩm</div>
+        <div style="font-size:12px;color:#8A7A70;" id="m-prod-cat">Danh mục: Bột làm bánh</div>
+      </div>
+
+      <div class="product-info-banner">
+        <div class="p-info-item">
+          <div class="label">Tồn kho hiện tại</div>
+          <div class="val" id="m-current-stock">150</div>
+        </div>
+        <div class="p-info-item">
+          <div class="label">Đã đặt giữ</div>
+          <div class="val" id="m-current-reserved" style="color:#D97745;">10</div>
+        </div>
+        <div class="p-info-item">
+          <div class="label">Có thể bán</div>
+          <div class="val" id="m-current-available" style="color:#059669;">140</div>
+        </div>
+      </div>
+
+      <!-- Adjustment Form -->
+      <div class="form-group">
+        <label class="form-label">Loại điều chỉnh <span class="req">*</span></label>
+        <select id="adj-type" class="form-control" onchange="onAdjustmentTypeChange()">
+          <option value="import">Nhập hàng (Tăng tồn kho)</option>
+          <option value="export">Xuất/Điều chỉnh giảm</option>
+          <option value="set">Chốt tồn kho (Set số tuyệt đối)</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label" id="adj-qty-label">Số lượng nhập <span class="req">*</span></label>
+        <input type="number" id="adj-qty" class="form-control" placeholder="Nhập số lượng..." min="1" step="1" oninput="updatePreview()" />
+        <span class="error-msg" id="err-adj-qty"></span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Lý do điều chỉnh <span class="req">*</span></label>
+        <select id="adj-reason-select" class="form-control">
+          <!-- Populated dynamically -->
+        </select>
+        <span class="error-msg" id="err-adj-reason"></span>
+      </div>
+
+      <div class="form-group">
+        <label class="form-label">Ghi chú bổ sung (tùy chọn)</label>
+        <textarea id="adj-note" class="form-control" rows="2" placeholder="Nhập thông tin chứng từ, số lô, phiếu nhập kho nếu có..."></textarea>
+      </div>
+
+      <!-- Preview Box -->
+      <div class="preview-box">
+        <div class="preview-row">
+          <span>Tồn kho hiện tại:</span>
+          <span id="prev-before-stock" style="font-weight:600;">150</span>
+        </div>
+        <div class="preview-row">
+          <span>Biến động số lượng:</span>
+          <span id="prev-change" style="font-weight:700;color:#059669;">+0</span>
+        </div>
+        <div class="preview-row">
+          <span>Tồn kho sau điều chỉnh:</span>
+          <span class="preview-val" id="prev-after-stock">150</span>
+        </div>
+        <div class="preview-row">
+          <span>Có thể bán sau điều chỉnh:</span>
+          <span class="preview-val" id="prev-after-available" style="color:#332A25;">140</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button onclick="closeAdjustModal()" style="padding:9px 20px;border:1px solid #EDE5DB;border-radius:8px;background:#fff;cursor:pointer;font-weight:600;font-size:13px;">Hủy bỏ</button>
+      <button onclick="confirmAdjustment()" style="padding:9px 22px;background:#D97745;color:#fff;border:none;border-radius:8px;cursor:pointer;font-weight:700;font-size:13px;">Xác nhận điều chỉnh</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="toast-container"></div>
+
+<script src="../scripts/main.js"></script>
+<script>
+'use strict';
+
+// ══════════════════════════════════════════════════════════
+//  SAMPLE CATEGORIES & SAMPLE DATA
+// ══════════════════════════════════════════════════════════
+const CATEGORIES = [
+  {id:"bot",      name:"Bột làm bánh"},
+  {id:"duong",    name:"Đường & Chất tạo ngọt"},
+  {id:"bo-sua",   name:"Bơ & Sữa"},
+  {id:"chocolate",name:"Chocolate"},
+  {id:"trang-tri",name:"Nguyên liệu trang trí"},
+  {id:"dung-cu",  name:"Dụng cụ làm bánh"},
+  {id:"thiet-bi", name:"Thiết bị làm bánh"}
+];
+
+// Pre-populated sample adjustment history records per SRS
+const DEFAULT_HISTORY = [
+  {time:"2024-11-10T09:00:00", staff:"Lê Thị Hoa", product:"Bột mì đa dụng Meizan 1kg", type:"Nhập hàng", before:100, after:150, change:+50, reason:"Nhập hàng mới"},
+  {time:"2024-11-08T14:00:00", staff:"Lê Thị Hoa", product:"Bơ nhạt Anchor 200g", before:80, after:60, change:-20, type:"Xuất giảm", reason:"Hàng hỏng/hết hạn"},
+  {time:"2024-11-05T10:30:00", staff:"Lê Thị Hoa", product:"Lò nướng mini 20L Electrolux", before:10, after:8, change:-2, type:"Xuất giảm", reason:"Xuất nội bộ"},
+  {time:"2024-11-01T16:00:00", staff:"Lê Thị Hoa", product:"Màu thực phẩm gel (bộ 12 màu)", before:20, after:25, change:+5, type:"Nhập hàng", reason:"Điều chỉnh sai số"},
+  {time:"2024-10-28T11:00:00", staff:"Lê Thị Hoa", product:"Đường cát trắng Biên Hòa 1kg", before:200, after:200, change:0, type:"Chốt tồn", reason:"Kiểm kê định kỳ"}
+];
+
+let INVENTORY_PRODUCTS = [];
+let ADJUSTMENT_HISTORY = [];
+
+function loadData() {
+  // Load products (sync with products.html via localStorage if present)
+  const savedProds = localStorage.getItem('ghp_admin_products');
+  if (savedProds) {
+    try {
+      INVENTORY_PRODUCTS = JSON.parse(savedProds);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
+  if (!INVENTORY_PRODUCTS || INVENTORY_PRODUCTS.length === 0) {
+    INVENTORY_PRODUCTS = PRODUCTS.map((p, idx) => {
+      const num = idx + 1;
+      return Object.assign({}, p, {
+        active: (num === 19) ? false : true,
+        code: 'GHP-' + String(num).padStart(3, '0')
+      });
+    });
+    localStorage.setItem('ghp_admin_products', JSON.stringify(INVENTORY_PRODUCTS));
+  }
+
+  // Load history
+  const savedHistory = localStorage.getItem('ghp_inventory_history');
+  if (savedHistory) {
+    try {
+      ADJUSTMENT_HISTORY = JSON.parse(savedHistory);
+    } catch(e) {
+      ADJUSTMENT_HISTORY = [...DEFAULT_HISTORY];
+    }
+  } else {
+    ADJUSTMENT_HISTORY = [...DEFAULT_HISTORY];
+    localStorage.setItem('ghp_inventory_history', JSON.stringify(ADJUSTMENT_HISTORY));
+  }
+}
+
+function saveProducts() {
+  localStorage.setItem('ghp_admin_products', JSON.stringify(INVENTORY_PRODUCTS));
+}
+
+function saveHistory() {
+  localStorage.setItem('ghp_inventory_history', JSON.stringify(ADJUSTMENT_HISTORY));
+}
+
+// ══════════════════════════════════════════════════════════
+//  AUTH CHECK
+// ══════════════════════════════════════════════════════════
+let currentUser = null;
+
+function checkAuth() {
+  const raw = sessionStorage.getItem('ghp_user');
+  if (!raw) {
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('page-403').style.display = 'flex';
+    return false;
+  }
+  try {
+    currentUser = JSON.parse(raw);
+  } catch(e) {
+    currentUser = null;
+  }
+
+  if (!currentUser || currentUser.role !== 'inventory_staff') {
+    document.getElementById('app').style.display = 'none';
+    document.getElementById('page-403').style.display = 'flex';
+    return false;
+  }
+
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('page-403').style.display = 'none';
+  document.getElementById('sidebar-user').textContent = currentUser.name || 'Lê Thị Hoa';
+  document.getElementById('topbar-user').textContent = currentUser.name || 'Lê Thị Hoa';
+  document.getElementById('history-staff-name').textContent = currentUser.name || 'Lê Thị Hoa';
+  return true;
+}
+
+function quickLoginInventory() {
+  const staff = {
+    id: 3,
+    name: "Lê Thị Hoa",
+    email: "hoa.inventory@ghp.vn",
+    phone: "0923456789",
+    role: "inventory_staff"
+  };
+  sessionStorage.setItem('ghp_user', JSON.stringify(staff));
+  window.location.reload();
+}
+
+function doLogout() {
+  sessionStorage.removeItem('ghp_user');
+  window.location.href = '../login.html';
+}
+
+// ══════════════════════════════════════════════════════════
+//  POPULATE CATEGORY FILTER
+// ══════════════════════════════════════════════════════════
+function populateCategoryFilter() {
+  const sel = document.getElementById('inv-cat-filter');
+  CATEGORIES.forEach(c => {
+    const opt = document.createElement('option');
+    opt.value = c.id;
+    opt.textContent = c.name;
+    sel.appendChild(opt);
+  });
+}
+
+// ══════════════════════════════════════════════════════════
+//  RENDER SUMMARY CARDS
+// ══════════════════════════════════════════════════════════
+function updateSummaryCards() {
+  let lowCount = 0;
+  let outCount = 0;
+  const lowStockNames = [];
+
+  INVENTORY_PRODUCTS.forEach(p => {
+    const stock = Number(p.stock) || 0;
+    const reserved = Number(p.reserved) || 0;
+    const available = stock - reserved;
+
+    if (stock === 0 || available <= 0) {
+      outCount++;
+      lowStockNames.push(p.name + ` (Hết hàng)`);
+    } else if (available < 10) {
+      lowCount++;
+      lowStockNames.push(p.name + ` (còn ${available})`);
+    }
+  });
+
+  const totalLowAndOut = lowCount + outCount;
+  document.getElementById('low-stock-count-text').textContent = `${totalLowAndOut} sản phẩm sắp hết hàng`;
+  document.getElementById('total-products-count').textContent = INVENTORY_PRODUCTS.length;
+  document.getElementById('out-of-stock-count').textContent = outCount;
+
+  const chipList = document.getElementById('low-stock-chip-list');
+  if (lowStockNames.length === 0) {
+    chipList.innerHTML = `<span style="font-size:12px;color:#065F46;font-weight:600;">✓ Tất cả mặt hàng đều đủ tồn kho an toàn.</span>`;
+  } else {
+    chipList.innerHTML = lowStockNames.map(item => `
+      <span class="low-stock-chip" onclick="filterByChipName('${item.split(' (')[0]}')">
+        ⚠ ${item}
+      </span>
+    `).join('');
+  }
+}
+
+function filterByChipName(name) {
+  document.getElementById('inv-search').value = name;
+  renderInventory();
+}
+
+// ══════════════════════════════════════════════════════════
+//  INVENTORY TABLE & PAGINATION
+// ══════════════════════════════════════════════════════════
+let invPage = 1;
+const INV_PER_PAGE = 10;
+
+function getFilteredInventory() {
+  const q       = document.getElementById('inv-search').value.toLowerCase().trim();
+  const cat     = document.getElementById('inv-cat-filter').value;
+  const lowOnly = document.getElementById('inv-low-only').checked;
+
+  return INVENTORY_PRODUCTS.filter(p => {
+    const stock = Number(p.stock) || 0;
+    const reserved = Number(p.reserved) || 0;
+    const available = stock - reserved;
+
+    const matchQ   = !q || p.name.toLowerCase().includes(q) || (p.code && p.code.toLowerCase().includes(q));
+    const matchCat = !cat || p.category === cat;
+    const matchLow = !lowOnly || (available < 10 || stock === 0);
+
+    return matchQ && matchCat && matchLow;
+  });
+}
+
+function renderInventory() {
+  const list  = getFilteredInventory();
+  const total = list.length;
+  const pages = Math.max(1, Math.ceil(total / INV_PER_PAGE));
+  if (invPage > pages) invPage = pages;
+  const start = (invPage - 1) * INV_PER_PAGE;
+  const slice = list.slice(start, start + INV_PER_PAGE);
+
+  const tbody = document.getElementById('inv-tbody');
+  if (slice.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:32px;color:#8A7A70;">Không có sản phẩm nào phù hợp điều kiện lọc.</td></tr>`;
+  } else {
+    tbody.innerHTML = slice.map(p => {
+      const stock = Number(p.stock) || 0;
+      const reserved = Number(p.reserved) || 0;
+      const available = stock - reserved;
+
+      let levelBadge = '';
+      if (stock === 0) {
+        levelBadge = `<span class="badge-stock-out">✕ Hết hàng</span>`;
+      } else if (available < 10) {
+        levelBadge = `<span class="badge-stock-low">⚠ Tồn thấp</span>`;
+      } else {
+        levelBadge = `<span class="badge-stock-ok">● Bình thường</span>`;
+      }
+
+      const catObj = CATEGORIES.find(c => c.id === p.category);
+      const catName = catObj ? catObj.name : (p.catName || p.category);
+
+      return `<tr>
+        <td><code style="font-size:11px;background:#F3EDE5;padding:2px 6px;border-radius:4px;font-weight:700;">${p.code || 'GHP-'+p.id}</code></td>
+        <td>
+          <div style="font-weight:700;color:#332A25;">${p.name}</div>
+          <div style="font-size:11px;color:#8A7A70;">Đơn vị: ${p.unit || 'cái'}</div>
+        </td>
+        <td>${catName}</td>
+        <td style="text-align:right;font-weight:700;font-size:14px;color:#332A25;">${stock}</td>
+        <td style="text-align:right;color:#D97745;font-weight:600;">${reserved}</td>
+        <td style="text-align:right;font-weight:700;font-size:14px;color:${available < 10 ? '#DC2626' : '#059669'};">${available}</td>
+        <td style="text-align:center;">${levelBadge}</td>
+        <td style="text-align:center;">
+          <button class="btn-adjust" onclick="openAdjustModal(${p.id})">Điều chỉnh</button>
+        </td>
+      </tr>`;
+    }).join('');
+  }
+
+  document.getElementById('inv-paging-info').textContent =
+    total > 0 ? `Hiển thị ${start + 1}–${Math.min(start + INV_PER_PAGE, total)} / ${total} sản phẩm` : '0 sản phẩm';
+  renderPaginationControl('inv-paging-btns', invPage, pages, (p) => { invPage = p; renderInventory(); });
+}
+
+// ══════════════════════════════════════════════════════════
+//  ADJUSTMENT HISTORY TABLE & PAGINATION
+// ══════════════════════════════════════════════════════════
+let histPage = 1;
+const HIST_PER_PAGE = 10;
+
+function formatDateTime(isoString) {
+  if (!isoString) return '–';
+  try {
+    const d = new Date(isoString);
+    const day = String(d.getDate()).padStart(2,'0');
+    const mon = String(d.getMonth()+1).padStart(2,'0');
+    const yr  = d.getFullYear();
+    const hh  = String(d.getHours()).padStart(2,'0');
+    const mm  = String(d.getMinutes()).padStart(2,'0');
+    return `${hh}:${mm} - ${day}/${mon}/${yr}`;
+  } catch(e) {
+    return isoString;
+  }
+}
+
+function getFilteredHistory() {
+  const q = document.getElementById('history-search').value.toLowerCase().trim();
+  return ADJUSTMENT_HISTORY.filter(h => {
+    return !q || (h.product && h.product.toLowerCase().includes(q)) || (h.reason && h.reason.toLowerCase().includes(q));
+  });
+}
+
+function renderHistory() {
+  const list  = getFilteredHistory();
+  const total = list.length;
+  const pages = Math.max(1, Math.ceil(total / HIST_PER_PAGE));
+  if (histPage > pages) histPage = pages;
+  const start = (histPage - 1) * HIST_PER_PAGE;
+  const slice = list.slice(start, start + HIST_PER_PAGE);
+
+  const tbody = document.getElementById('history-tbody');
+  if (slice.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:24px;color:#8A7A70;">Không có dữ liệu lịch sử điều chỉnh nào.</td></tr>`;
+  } else {
+    tbody.innerHTML = slice.map(h => {
+      let changeClass = 'change-zero';
+      let changeText = '0';
+      if (h.change > 0) {
+        changeClass = 'change-plus';
+        changeText = `+${h.change}`;
+      } else if (h.change < 0) {
+        changeClass = 'change-minus';
+        changeText = `${h.change}`;
+      }
+
+      let typeBadge = '';
+      if (h.type === 'Nhập hàng') {
+        typeBadge = `<span style="background:#D1FAE5;color:#065F46;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;">Nhập hàng</span>`;
+      } else if (h.type === 'Xuất giảm') {
+        typeBadge = `<span style="background:#FEE2E2;color:#991B1B;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;">Xuất giảm</span>`;
+      } else {
+        typeBadge = `<span style="background:#E0E7FF;color:#3730A3;padding:2px 8px;border-radius:12px;font-size:11px;font-weight:700;">Chốt tồn</span>`;
+      }
+
+      return `<tr>
+        <td style="white-space:nowrap;font-size:12px;color:#8A7A70;">${formatDateTime(h.time)}</td>
+        <td style="font-weight:600;">${h.staff}</td>
+        <td><strong>${h.product}</strong></td>
+        <td>${typeBadge}</td>
+        <td style="text-align:right;">${h.before}</td>
+        <td style="text-align:right;font-weight:700;">${h.after}</td>
+        <td style="text-align:center;"><span class="${changeClass}">${changeText}</span></td>
+        <td style="font-size:12.5px;color:#332A25;">${h.reason}</td>
+      </tr>`;
+    }).join('');
+  }
+
+  document.getElementById('history-paging-info').textContent =
+    total > 0 ? `Hiển thị ${start + 1}–${Math.min(start + HIST_PER_PAGE, total)} / ${total} bản ghi` : '0 bản ghi';
+  renderPaginationControl('history-paging-btns', histPage, pages, (p) => { histPage = p; renderHistory(); });
+}
+
+// ══════════════════════════════════════════════════════════
+//  REUSABLE PAGINATION HELPER
+// ══════════════════════════════════════════════════════════
+function renderPaginationControl(containerId, current, total, onPage) {
+  const container = document.getElementById(containerId);
+  if (total <= 1) { container.innerHTML = ''; return; }
+  let html = `<button class="pg-btn" ${current===1?'disabled':''} onclick="(${onPage})(${current-1})">‹</button>`;
+  const range = [];
+  for (let i = 1; i <= total; i++) {
+    if (i===1 || i===total || Math.abs(i-current)<=1) range.push(i);
+    else if (range[range.length-1] !== '…') range.push('…');
+  }
+  range.forEach(i => {
+    if (i === '…') html += `<span style="padding:0 4px;color:#8A7A70;">…</span>`;
+    else html += `<button class="pg-btn ${i===current?'active':''}" onclick="(${onPage})(${i})">${i}</button>`;
+  });
+  html += `<button class="pg-btn" ${current===total?'disabled':''} onclick="(${onPage})(${current+1})">›</button>`;
+  container.innerHTML = html;
+}
+
+// ══════════════════════════════════════════════════════════
+//  ADJUSTMENT MODAL LOGIC
+// ══════════════════════════════════════════════════════════
+let adjustingProduct = null;
+
+const REASON_OPTIONS = {
+  import: [
+    "Nhập hàng mới",
+    "Trả hàng từ đơn",
+    "Điều chỉnh sai số"
+  ],
+  export: [
+    "Hàng hỏng/hết hạn",
+    "Điều chỉnh sai số",
+    "Xuất nội bộ"
+  ],
+  set: [
+    "Kiểm kê định kỳ"
+  ]
+};
+
+function openAdjustModal(productId) {
+  adjustingProduct = INVENTORY_PRODUCTS.find(p => p.id === productId);
+  if (!adjustingProduct) return;
+
+  const stock = Number(adjustingProduct.stock) || 0;
+  const reserved = Number(adjustingProduct.reserved) || 0;
+  const available = stock - reserved;
+
+  document.getElementById('m-prod-code').textContent = adjustingProduct.code || ('GHP-' + adjustingProduct.id);
+  document.getElementById('m-prod-name').textContent = adjustingProduct.name;
+  const catObj = CATEGORIES.find(c => c.id === adjustingProduct.category);
+  document.getElementById('m-prod-cat').textContent = `Danh mục: ${catObj ? catObj.name : adjustingProduct.catName} | Đơn vị: ${adjustingProduct.unit || 'cái'}`;
+
+  document.getElementById('m-current-stock').textContent = stock;
+  document.getElementById('m-current-reserved').textContent = reserved;
+  document.getElementById('m-current-available').textContent = available;
+
+  document.getElementById('prev-before-stock').textContent = stock;
+
+  document.getElementById('adj-type').value = 'import';
+  document.getElementById('adj-qty').value = '';
+  document.getElementById('adj-note').value = '';
+  document.getElementById('err-adj-qty').textContent = '';
+  document.getElementById('err-adj-reason').textContent = '';
+
+  onAdjustmentTypeChange();
+  updatePreview();
+
+  document.getElementById('modal-adjust').classList.add('open');
+}
+
+function closeAdjustModal() {
+  document.getElementById('modal-adjust').classList.remove('open');
+  adjustingProduct = null;
+}
+
+function onAdjustmentTypeChange() {
+  const type = document.getElementById('adj-type').value;
+  const qtyLabel = document.getElementById('adj-qty-label');
+  const reasonSel = document.getElementById('adj-reason-select');
+
+  if (type === 'import') {
+    qtyLabel.innerHTML = 'Số lượng nhập thêm <span class="req">*</span>';
+  } else if (type === 'export') {
+    qtyLabel.innerHTML = 'Số lượng xuất giảm <span class="req">*</span>';
+  } else {
+    qtyLabel.innerHTML = 'Số lượng tồn chốt thực tế <span class="req">*</span>';
+  }
+
+  // Populate reasons
+  const options = REASON_OPTIONS[type] || [];
+  reasonSel.innerHTML = options.map(r => `<option value="${r}">${r}</option>`).join('');
+
+  updatePreview();
+}
+
+function updatePreview() {
+  if (!adjustingProduct) return;
+
+  const currentStock = Number(adjustingProduct.stock) || 0;
+  const reserved = Number(adjustingProduct.reserved) || 0;
+  const type = document.getElementById('adj-type').value;
+  const qtyInput = document.getElementById('adj-qty');
+  const qtyVal = parseInt(qtyInput.value);
+
+  const prevChange = document.getElementById('prev-change');
+  const prevAfterStock = document.getElementById('prev-after-stock');
+  const prevAfterAvail = document.getElementById('prev-after-available');
+  const errQty = document.getElementById('err-adj-qty');
+
+  errQty.textContent = '';
+  qtyInput.classList.remove('error');
+
+  if (isNaN(qtyVal)) {
+    prevChange.textContent = '+0';
+    prevChange.className = 'change-zero';
+    prevAfterStock.textContent = currentStock;
+    prevAfterAvail.textContent = currentStock - reserved;
+    return;
+  }
+
+  if (qtyVal < 0) {
+    errQty.textContent = 'Số lượng phải là số dương.';
+    qtyInput.classList.add('error');
+    return;
+  }
+
+  let calculatedStock = currentStock;
+  let diff = 0;
+
+  if (type === 'import') {
+    diff = qtyVal;
+    calculatedStock = currentStock + diff;
+    prevChange.textContent = `+${diff}`;
+    prevChange.style.color = '#059669';
+  } else if (type === 'export') {
+    diff = -qtyVal;
+    calculatedStock = currentStock + diff;
+    prevChange.textContent = `${diff}`;
+    prevChange.style.color = '#DC2626';
+
+    if (calculatedStock < reserved) {
+      errQty.textContent = `Không thể giảm dưới mức đã đặt giữ (${reserved} đơn vị). Tồn sau giảm: ${calculatedStock}.`;
+      qtyInput.classList.add('error');
+    }
+  } else if (type === 'set') {
+    calculatedStock = qtyVal;
+    diff = calculatedStock - currentStock;
+    prevChange.textContent = diff > 0 ? `+${diff}` : (diff < 0 ? `${diff}` : '0');
+    prevChange.style.color = diff > 0 ? '#059669' : (diff < 0 ? '#DC2626' : '#6B7280');
+
+    if (calculatedStock < reserved) {
+      errQty.textContent = `Không thể chốt tồn dưới mức đã đặt giữ (${reserved} đơn vị).`;
+      qtyInput.classList.add('error');
+    }
+  }
+
+  if (calculatedStock < 0) {
+    errQty.textContent = 'Số lượng tồn kho không thể âm.';
+    qtyInput.classList.add('error');
+  }
+
+  prevAfterStock.textContent = calculatedStock;
+  const calculatedAvail = calculatedStock - reserved;
+  prevAfterAvail.textContent = calculatedAvail;
+}
+
+function confirmAdjustment() {
+  if (!adjustingProduct) return;
+
+  const currentStock = Number(adjustingProduct.stock) || 0;
+  const reserved = Number(adjustingProduct.reserved) || 0;
+  const type = document.getElementById('adj-type').value;
+  const qtyInput = document.getElementById('adj-qty');
+  const qtyVal = parseInt(qtyInput.value);
+  const reasonSelect = document.getElementById('adj-reason-select');
+  const selectedReason = reasonSelect.value;
+  const extraNote = document.getElementById('adj-note').value.trim();
+
+  const errQty = document.getElementById('err-adj-qty');
+  const errReason = document.getElementById('err-adj-reason');
+  errQty.textContent = '';
+  errReason.textContent = '';
+
+  // Validation
+  if (isNaN(qtyVal) || qtyVal < 0 || (type !== 'set' && qtyVal <= 0)) {
+    errQty.textContent = 'Vui lòng nhập số lượng hợp lệ lớn hơn 0.';
+    qtyInput.classList.add('error');
+    return;
+  }
+
+  if (!selectedReason) {
+    errReason.textContent = 'Vui lòng chọn lý do điều chỉnh.';
+    return;
+  }
+
+  let finalStock = currentStock;
+  let diff = 0;
+  let historyTypeName = 'Nhập hàng';
+
+  if (type === 'import') {
+    diff = qtyVal;
+    finalStock = currentStock + diff;
+    historyTypeName = 'Nhập hàng';
+  } else if (type === 'export') {
+    diff = -qtyVal;
+    finalStock = currentStock + diff;
+    historyTypeName = 'Xuất giảm';
+    if (finalStock < reserved) {
+      errQty.textContent = `Không thể giảm dưới mức đã đặt giữ (${reserved}).`;
+      qtyInput.classList.add('error');
+      return;
+    }
+  } else if (type === 'set') {
+    finalStock = qtyVal;
+    diff = finalStock - currentStock;
+    historyTypeName = 'Chốt tồn';
+    if (finalStock < reserved) {
+      errQty.textContent = `Không thể chốt tồn kho dưới mức đã đặt giữ (${reserved}).`;
+      qtyInput.classList.add('error');
+      return;
+    }
+  }
+
+  if (finalStock < 0) {
+    errQty.textContent = 'Tồn kho không thể là số âm.';
+    qtyInput.classList.add('error');
+    return;
+  }
+
+  // Perform Update
+  adjustingProduct.stock = finalStock;
+  saveProducts();
+
+  // Add Record to History
+  const staffName = (currentUser && currentUser.name) ? currentUser.name : 'Lê Thị Hoa';
+  const fullReason = extraNote ? `${selectedReason} (${extraNote})` : selectedReason;
+
+  const newRecord = {
+    time: new Date().toISOString(),
+    staff: staffName,
+    product: adjustingProduct.name,
+    type: historyTypeName,
+    before: currentStock,
+    after: finalStock,
+    change: diff,
+    reason: fullReason
+  };
+
+  ADJUSTMENT_HISTORY.unshift(newRecord);
+  saveHistory();
+
+  showToast(`Đã điều chỉnh tồn kho ${adjustingProduct.name} thành ${finalStock} ${adjustingProduct.unit || 'cái'}`, 'success');
+
+  closeAdjustModal();
+  updateSummaryCards();
+  renderInventory();
+  renderHistory();
+}
+
+// ══════════════════════════════════════════════════════════
+//  TOAST HELPER
+// ══════════════════════════════════════════════════════════
+function showToast(msg, type='success', duration=3200) {
+  const container = document.getElementById('toast-container');
+  const el = document.createElement('div');
+  el.className = `toast-item ${type}`;
+  el.textContent = msg;
+  container.appendChild(el);
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transition = '0.3s';
+    setTimeout(() => el.remove(), 300);
+  }, duration);
+}
+
+// Backdrop click
+document.querySelectorAll('.modal-backdrop').forEach(bd => {
+  bd.addEventListener('click', e => {
+    if (e.target === bd) bd.classList.remove('open');
+  });
+});
+
+// ══════════════════════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', () => {
+  if (!checkAuth()) return;
+  loadData();
+  populateCategoryFilter();
+  updateSummaryCards();
+  renderInventory();
+  renderHistory();
+});
+</script>
+</body>
+</html>

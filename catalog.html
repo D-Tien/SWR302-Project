@@ -1,0 +1,1007 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Sản phẩm – Gia Hoà Phát</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/main.css" />
+  <style>
+    :root {
+      --color-primary: #D97745;
+      --color-secondary: #FFF8F0;
+      --color-accent: #789B75;
+      --color-text: #332A25;
+      --color-text-muted: #9C8A7E;
+      --color-border: #EDE5DB;
+      --color-bg: #F9F5F0;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Nunito', sans-serif; color: var(--color-text); background: var(--color-bg); }
+
+    /* ── TOP INFO BAR ── */
+    .top-bar {
+      background: var(--color-primary);
+      color: #fff;
+      text-align: center;
+      font-size: .78rem;
+      padding: .4rem 1rem;
+      font-weight: 600;
+      letter-spacing: .02em;
+    }
+
+    /* ── HEADER ── */
+    .site-header {
+      background: #fff;
+      border-bottom: 1px solid var(--color-border);
+      position: sticky; top: 0; z-index: 100;
+      box-shadow: 0 2px 8px rgba(51,42,37,.06);
+    }
+    .header-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; align-items: center; justify-content: space-between;
+      height: 64px; padding: 0 1.5rem; gap: 1rem;
+    }
+    .logo-link { text-decoration: none; display: flex; align-items: center; gap: .5rem; flex-shrink: 0; }
+    .logo-badge {
+      width: 40px; height: 40px; background: var(--color-primary);
+      border-radius: 10px; display: flex; align-items: center; justify-content: center;
+      color: #fff; font-family: 'Playfair Display', serif; font-weight: 700; font-size: 1.1rem;
+    }
+    .logo-text { display: flex; flex-direction: column; }
+    .logo-text strong { font-family: 'Playfair Display', serif; font-size: 1.1rem; color: var(--color-primary); line-height: 1.1; }
+    .logo-text span { font-size: .7rem; color: var(--color-text-muted); }
+    .header-search { flex: 1; max-width: 420px; }
+    .header-search .search-row { display: flex; border: 1.5px solid var(--color-border); border-radius: 8px; overflow: hidden; }
+    .header-search input {
+      flex: 1; padding: .55rem .9rem; border: none; outline: none;
+      font-family: 'Nunito', sans-serif; font-size: .9rem; color: var(--color-text); background: #fff;
+    }
+    .header-search button {
+      padding: .55rem 1rem; background: var(--color-primary); border: none; color: #fff;
+      cursor: pointer; font-size: .9rem; transition: background .2s;
+    }
+    .header-search button:hover { background: #c4663a; }
+    .header-actions { display: flex; align-items: center; gap: 1rem; }
+    .header-actions a { text-decoration: none; color: var(--color-text); font-size: .88rem; font-weight: 600; }
+    .header-actions a:hover { color: var(--color-primary); }
+    .cart-link { position: relative; }
+    .cart-badge {
+      position: absolute; top: -6px; right: -8px;
+      background: var(--color-primary); color: #fff; border-radius: 50%;
+      width: 18px; height: 18px; font-size: .65rem;
+      display: flex; align-items: center; justify-content: center; font-weight: 700;
+    }
+    /* ── CATEGORY NAV ── */
+    .cat-nav {
+      background: #fff; border-bottom: 1px solid var(--color-border);
+      overflow-x: auto; white-space: nowrap;
+    }
+    .cat-nav-inner {
+      max-width: 1200px; margin: 0 auto;
+      display: flex; padding: 0 1.5rem; gap: .2rem;
+    }
+    .cat-nav a {
+      display: inline-block; padding: .65rem 1rem;
+      font-size: .85rem; font-weight: 600; color: var(--color-text);
+      text-decoration: none; border-bottom: 2px solid transparent;
+      transition: color .2s, border-color .2s;
+    }
+    .cat-nav a:hover, .cat-nav a.active { color: var(--color-primary); border-bottom-color: var(--color-primary); }
+
+    /* ── BREADCRUMB ── */
+    .breadcrumb-bar { max-width: 1200px; margin: 0 auto; padding: .9rem 1.5rem; }
+    .breadcrumb { display: flex; align-items: center; gap: .4rem; font-size: .82rem; color: var(--color-text-muted); }
+    .breadcrumb a { color: var(--color-text-muted); text-decoration: none; }
+    .breadcrumb a:hover { color: var(--color-primary); }
+    .breadcrumb .sep { font-size: .7rem; }
+    .breadcrumb .current { color: var(--color-text); font-weight: 600; }
+
+    /* ── LAYOUT ── */
+    .catalog-layout {
+      max-width: 1200px; margin: 0 auto;
+      display: grid; grid-template-columns: 280px 1fr;
+      gap: 1.5rem; padding: 0 1.5rem 3rem; align-items: start;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      background: #fff; border-radius: 12px;
+      border: 1px solid var(--color-border);
+      padding: 0; overflow: hidden;
+      position: sticky; top: 72px;
+    }
+    .sidebar-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1rem 1.2rem; border-bottom: 1px solid var(--color-border);
+    }
+    .sidebar-header h3 { font-size: .95rem; font-weight: 800; color: var(--color-text); }
+    .btn-clear-all {
+      font-size: .78rem; color: var(--color-primary); background: none; border: none;
+      cursor: pointer; font-weight: 700; text-decoration: underline;
+    }
+    .filter-section { padding: 1rem 1.2rem; border-bottom: 1px solid var(--color-border); }
+    .filter-section:last-child { border-bottom: none; }
+    .filter-section-title {
+      font-size: .88rem; font-weight: 800; color: var(--color-text);
+      margin-bottom: .7rem; display: flex; justify-content: space-between; align-items: center;
+      cursor: pointer;
+    }
+    .filter-section-title .toggle-arrow { font-size: .75rem; transition: transform .2s; }
+    .filter-section-title.collapsed .toggle-arrow { transform: rotate(-90deg); }
+    .filter-body { overflow: hidden; }
+    .filter-body.collapsed { display: none; }
+    .checkbox-list { display: flex; flex-direction: column; gap: .45rem; }
+    .checkbox-label {
+      display: flex; align-items: center; gap: .5rem;
+      font-size: .85rem; color: var(--color-text); cursor: pointer;
+    }
+    .checkbox-label input[type="checkbox"] {
+      width: 16px; height: 16px; accent-color: var(--color-primary); cursor: pointer; flex-shrink: 0;
+    }
+    /* Price range */
+    .price-range-wrap { margin-bottom: .8rem; }
+    .price-range-inputs { display: flex; gap: .5rem; align-items: center; }
+    .price-input {
+      flex: 1; padding: .4rem .6rem; border: 1.5px solid var(--color-border);
+      border-radius: 6px; font-family: 'Nunito', sans-serif; font-size: .82rem;
+      text-align: right; color: var(--color-text); min-width: 0;
+    }
+    .price-input:focus { outline: none; border-color: var(--color-primary); }
+    .price-sep { font-size: .8rem; color: var(--color-text-muted); flex-shrink: 0; }
+    input[type="range"] {
+      width: 100%; margin-bottom: .4rem; accent-color: var(--color-primary);
+    }
+    .price-display { font-size: .78rem; color: var(--color-text-muted); text-align: center; }
+
+    /* ── MAIN CONTENT ── */
+    .catalog-main {}
+
+    /* Active filter chips */
+    .active-filters {
+      display: flex; flex-wrap: wrap; gap: .4rem;
+      margin-bottom: 1rem;
+    }
+    .filter-chip {
+      display: inline-flex; align-items: center; gap: .3rem;
+      background: rgba(217,119,69,.12); color: var(--color-primary);
+      border: 1px solid rgba(217,119,69,.3);
+      border-radius: 20px; padding: .25rem .7rem;
+      font-size: .78rem; font-weight: 700;
+    }
+    .filter-chip button {
+      background: none; border: none; color: var(--color-primary);
+      cursor: pointer; font-size: .9rem; line-height: 1; padding: 0;
+    }
+
+    /* Results bar */
+    .results-bar {
+      display: flex; align-items: center; justify-content: space-between;
+      flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem;
+    }
+    .results-info { font-size: .85rem; color: var(--color-text-muted); font-weight: 600; }
+    .results-info strong { color: var(--color-text); }
+    .sort-wrap { display: flex; align-items: center; gap: .5rem; }
+    .sort-wrap label { font-size: .82rem; font-weight: 600; color: var(--color-text-muted); }
+    .sort-select {
+      padding: .4rem .8rem; border: 1.5px solid var(--color-border); border-radius: 8px;
+      font-family: 'Nunito', sans-serif; font-size: .85rem; color: var(--color-text);
+      background: #fff; cursor: pointer;
+    }
+    .sort-select:focus { outline: none; border-color: var(--color-primary); }
+
+    /* Catalog search bar */
+    .catalog-search-bar {
+      display: flex; gap: .5rem; margin-bottom: 1.2rem;
+    }
+    .catalog-search-bar input {
+      flex: 1; padding: .65rem 1rem; border: 1.5px solid var(--color-border); border-radius: 8px;
+      font-family: 'Nunito', sans-serif; font-size: .9rem; color: var(--color-text); background: #fff;
+    }
+    .catalog-search-bar input:focus { outline: none; border-color: var(--color-primary); box-shadow: 0 0 0 3px rgba(217,119,69,.15); }
+    .catalog-search-bar button {
+      padding: .65rem 1.4rem; background: var(--color-primary); color: #fff;
+      border: none; border-radius: 8px; font-family: 'Nunito', sans-serif;
+      font-weight: 700; font-size: .9rem; cursor: pointer; transition: background .2s;
+    }
+    .catalog-search-bar button:hover { background: #c4663a; }
+
+    /* Product grid */
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1rem;
+    }
+    .product-card {
+      background: #fff; border-radius: 12px; border: 1px solid var(--color-border);
+      overflow: hidden; display: flex; flex-direction: column;
+      transition: transform .2s, box-shadow .2s;
+    }
+    .product-card:hover { transform: translateY(-3px); box-shadow: 0 8px 24px rgba(51,42,37,.12); }
+    .product-img-wrap {
+      position: relative; padding-bottom: 70%;
+      overflow: hidden; flex-shrink: 0;
+    }
+    .product-img-wrap .placeholder-img {
+      position: absolute; inset: 0;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.2rem;
+    }
+    .product-badges {
+      position: absolute; top: .5rem; left: .5rem;
+      display: flex; flex-direction: column; gap: .3rem;
+    }
+    .badge-new {
+      background: var(--color-accent); color: #fff;
+      font-size: .65rem; font-weight: 800; padding: .15rem .4rem;
+      border-radius: 4px; letter-spacing: .05em;
+    }
+    .badge-out {
+      background: #718096; color: #fff;
+      font-size: .65rem; font-weight: 800; padding: .15rem .4rem;
+      border-radius: 4px; letter-spacing: .05em;
+    }
+    .product-info { padding: .8rem; flex: 1; display: flex; flex-direction: column; gap: .3rem; }
+    .product-cat { font-size: .72rem; color: var(--color-text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: .04em; }
+    .product-name {
+      font-size: .88rem; font-weight: 700; color: var(--color-text);
+      display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+      flex: 1;
+    }
+    .product-unit { font-size: .75rem; color: var(--color-text-muted); }
+    .product-price { font-size: 1rem; font-weight: 800; color: var(--color-primary); }
+    .product-actions { display: flex; gap: .4rem; padding: 0 .8rem .8rem; }
+    .btn-detail {
+      flex: 1; padding: .5rem .4rem;
+      border: 1.5px solid var(--color-primary); border-radius: 7px;
+      background: none; color: var(--color-primary);
+      font-family: 'Nunito', sans-serif; font-size: .78rem; font-weight: 700;
+      cursor: pointer; text-align: center; text-decoration: none;
+      transition: background .2s, color .2s;
+    }
+    .btn-detail:hover { background: rgba(217,119,69,.1); }
+    .btn-add-cart {
+      flex: 1; padding: .5rem .4rem;
+      background: var(--color-primary); border: none; border-radius: 7px; color: #fff;
+      font-family: 'Nunito', sans-serif; font-size: .78rem; font-weight: 700;
+      cursor: pointer; transition: background .2s;
+    }
+    .btn-add-cart:hover:not(:disabled) { background: #c4663a; }
+    .btn-add-cart:disabled { background: #CBD5E0; cursor: not-allowed; }
+
+    /* Empty state */
+    .empty-state {
+      text-align: center; padding: 3rem 1rem;
+      background: #fff; border-radius: 12px; border: 1px solid var(--color-border);
+    }
+    .empty-state .empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+    .empty-state h3 { font-size: 1.1rem; color: var(--color-text); margin-bottom: .5rem; }
+    .empty-state p { font-size: .88rem; color: var(--color-text-muted); margin-bottom: 1.2rem; }
+    .btn-clear-filter {
+      padding: .6rem 1.4rem; background: var(--color-primary); color: #fff;
+      border: none; border-radius: 8px; font-family: 'Nunito', sans-serif;
+      font-weight: 700; font-size: .9rem; cursor: pointer; transition: background .2s;
+    }
+    .btn-clear-filter:hover { background: #c4663a; }
+
+    /* Pagination */
+    .pagination {
+      display: flex; align-items: center; justify-content: center; gap: .4rem;
+      margin-top: 1.5rem; flex-wrap: wrap;
+    }
+    .page-btn {
+      width: 36px; height: 36px; border-radius: 8px;
+      border: 1.5px solid var(--color-border); background: #fff;
+      font-family: 'Nunito', sans-serif; font-size: .88rem; font-weight: 700;
+      color: var(--color-text); cursor: pointer; transition: all .2s;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .page-btn:hover { border-color: var(--color-primary); color: var(--color-primary); }
+    .page-btn.active { background: var(--color-primary); border-color: var(--color-primary); color: #fff; }
+    .page-btn:disabled { opacity: .4; cursor: not-allowed; }
+    .page-btn.nav { width: auto; padding: 0 .8rem; }
+
+    /* Mobile filter toggle */
+    .mobile-filter-btn {
+      display: none;
+      align-items: center; gap: .5rem; padding: .6rem 1rem;
+      background: #fff; border: 1.5px solid var(--color-border); border-radius: 8px;
+      font-family: 'Nunito', sans-serif; font-size: .88rem; font-weight: 700;
+      color: var(--color-text); cursor: pointer; margin-bottom: .8rem;
+    }
+    .filter-overlay {
+      display: none; position: fixed; inset: 0; background: rgba(0,0,0,.4); z-index: 200;
+    }
+    .filter-drawer {
+      position: fixed; left: 0; top: 0; bottom: 0; width: 300px;
+      background: #fff; overflow-y: auto; transform: translateX(-100%);
+      transition: transform .3s; z-index: 201;
+    }
+    .filter-drawer.open { transform: translateX(0); }
+    .filter-overlay.open { display: block; }
+    .drawer-header {
+      display: flex; justify-content: space-between; align-items: center;
+      padding: 1rem 1.2rem; border-bottom: 1px solid var(--color-border); position: sticky; top: 0; background: #fff;
+    }
+    .drawer-header h3 { font-size: 1rem; font-weight: 800; }
+    .drawer-close { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--color-text-muted); }
+    .drawer-apply {
+      position: sticky; bottom: 0; padding: 1rem 1.2rem;
+      border-top: 1px solid var(--color-border); background: #fff;
+    }
+    .drawer-apply button {
+      display: block; width: 100%; padding: .75rem;
+      background: var(--color-primary); color: #fff; border: none; border-radius: 8px;
+      font-family: 'Nunito', sans-serif; font-size: .95rem; font-weight: 700; cursor: pointer;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      background: #fff; border-top: 1px solid var(--color-border);
+      text-align: center; padding: 1.5rem;
+      font-size: .8rem; color: var(--color-text-muted);
+    }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 1100px) {
+      .product-grid { grid-template-columns: repeat(3, 1fr); }
+    }
+    @media (max-width: 900px) {
+      .catalog-layout { grid-template-columns: 1fr; }
+      .sidebar { display: none; position: static; }
+      .mobile-filter-btn { display: flex; }
+      .product-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 576px) {
+      .product-grid { grid-template-columns: repeat(2, 1fr); gap: .6rem; }
+      .catalog-layout { padding: 0 .75rem 2rem; }
+      .header-search { display: none; }
+    }
+    @media (max-width: 375px) {
+      .product-grid { grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── TOP BAR ── -->
+  <div class="top-bar">🚚 Giao hàng toàn quốc &nbsp;|&nbsp; 📞 Hotline: 1800-GHP &nbsp;|&nbsp; 🕐 Thứ 2 – Thứ 7: 8:00 – 17:30</div>
+
+  <!-- ── HEADER ── -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo-link">
+        <div class="logo-badge">GHP</div>
+        <div class="logo-text"><strong>Gia Hoà Phát</strong><span>Nguyên liệu làm bánh</span></div>
+      </a>
+      <div class="header-search">
+        <div class="search-row">
+          <input type="text" id="headerSearchInput" placeholder="Tìm sản phẩm..." />
+          <button onclick="applyHeaderSearch()">🔍</button>
+        </div>
+      </div>
+      <div class="header-actions">
+        <a href="login.html" id="authLink">Đăng nhập</a>
+        <a href="cart.html" class="cart-link">🛒<span class="cart-badge" id="cartCount">0</span></a>
+      </div>
+    </div>
+  </header>
+
+  <!-- ── CATEGORY NAV ── -->
+  <nav class="cat-nav">
+    <div class="cat-nav-inner">
+      <a href="catalog.html" class="active">Tất cả</a>
+      <a href="catalog.html?cat=bot">Bột làm bánh</a>
+      <a href="catalog.html?cat=duong">Đường &amp; Chất tạo ngọt</a>
+      <a href="catalog.html?cat=bo-sua">Bơ &amp; Sữa</a>
+      <a href="catalog.html?cat=chocolate">Chocolate</a>
+      <a href="catalog.html?cat=trang-tri">Nguyên liệu trang trí</a>
+      <a href="catalog.html?cat=dung-cu">Dụng cụ làm bánh</a>
+      <a href="catalog.html?cat=thiet-bi">Thiết bị làm bánh</a>
+    </div>
+  </nav>
+
+  <!-- ── BREADCRUMB ── -->
+  <div class="breadcrumb-bar">
+    <nav class="breadcrumb" aria-label="breadcrumb">
+      <a href="index.html">Trang chủ</a>
+      <span class="sep">›</span>
+      <span class="current">Sản phẩm</span>
+    </nav>
+  </div>
+
+  <!-- ── MOBILE FILTER BUTTON ── -->
+  <div style="max-width:1200px;margin:0 auto;padding:0 1.5rem;">
+    <button class="mobile-filter-btn" onclick="openFilterDrawer()">🔧 Bộ lọc &amp; Sắp xếp</button>
+  </div>
+
+  <!-- ── MOBILE FILTER DRAWER ── -->
+  <div class="filter-overlay" id="filterOverlay" onclick="closeFilterDrawer()"></div>
+  <div class="filter-drawer" id="filterDrawer">
+    <div class="drawer-header">
+      <h3>Bộ lọc</h3>
+      <button class="drawer-close" onclick="closeFilterDrawer()">✕</button>
+    </div>
+    <div id="drawerFilters" style="padding:0 0 1rem;"><!-- filled by JS --></div>
+    <div class="drawer-apply">
+      <button onclick="closeFilterDrawer()">Áp dụng</button>
+    </div>
+  </div>
+
+  <!-- ── CATALOG LAYOUT ── -->
+  <div class="catalog-layout">
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="desktopSidebar">
+      <div class="sidebar-header">
+        <h3>Bộ lọc</h3>
+        <button class="btn-clear-all" onclick="clearAllFilters()">Xóa bộ lọc</button>
+      </div>
+
+      <!-- Category -->
+      <div class="filter-section">
+        <div class="filter-section-title" onclick="toggleSection(this)">
+          Danh mục <span class="toggle-arrow">▾</span>
+        </div>
+        <div class="filter-body" id="catFilter">
+          <div class="checkbox-list" id="catCheckboxes"></div>
+        </div>
+      </div>
+
+      <!-- Price -->
+      <div class="filter-section">
+        <div class="filter-section-title" onclick="toggleSection(this)">
+          Giá <span class="toggle-arrow">▾</span>
+        </div>
+        <div class="filter-body">
+          <div class="price-range-wrap">
+            <input type="range" id="priceRange" min="0" max="2000000" step="10000" value="2000000" oninput="onRangeChange(this.value)" />
+            <div class="price-display" id="priceDisplay">0 ₫ – 2.000.000 ₫</div>
+          </div>
+          <div class="price-range-inputs">
+            <input type="number" class="price-input" id="priceMin" value="0" min="0" max="2000000" step="10000" oninput="onMinInput(this.value)" placeholder="Từ" />
+            <span class="price-sep">–</span>
+            <input type="number" class="price-input" id="priceMax" value="2000000" min="0" max="2000000" step="10000" oninput="onMaxInput(this.value)" placeholder="Đến" />
+          </div>
+        </div>
+      </div>
+
+      <!-- Brand -->
+      <div class="filter-section">
+        <div class="filter-section-title" onclick="toggleSection(this)">
+          Thương hiệu <span class="toggle-arrow">▾</span>
+        </div>
+        <div class="filter-body">
+          <div class="checkbox-list" id="brandCheckboxes"></div>
+        </div>
+      </div>
+
+      <!-- Origin -->
+      <div class="filter-section">
+        <div class="filter-section-title" onclick="toggleSection(this)">
+          Xuất xứ <span class="toggle-arrow">▾</span>
+        </div>
+        <div class="filter-body">
+          <div class="checkbox-list" id="originCheckboxes"></div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN -->
+    <main class="catalog-main">
+      <!-- Search bar -->
+      <div class="catalog-search-bar">
+        <input type="text" id="keywordInput" placeholder="Tìm kiếm theo tên sản phẩm..." />
+        <button onclick="applySearch()">🔍 Tìm kiếm</button>
+      </div>
+
+      <!-- Active filter chips -->
+      <div class="active-filters" id="activeFilters"></div>
+
+      <!-- Results bar -->
+      <div class="results-bar">
+        <div class="results-info" id="resultsInfo">Đang tải...</div>
+        <div class="sort-wrap">
+          <label for="sortSelect">Sắp xếp:</label>
+          <select class="sort-select" id="sortSelect" onchange="applySort()">
+            <option value="default">Mặc định</option>
+            <option value="price_asc">Giá tăng dần</option>
+            <option value="price_desc">Giá giảm dần</option>
+            <option value="newest">Mới nhất</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Product grid -->
+      <div class="product-grid" id="productGrid"></div>
+
+      <!-- Empty state -->
+      <div class="empty-state" id="emptyState" style="display:none">
+        <div class="empty-icon">🔍</div>
+        <h3>Không tìm thấy sản phẩm phù hợp</h3>
+        <p>Thử thay đổi bộ lọc hoặc từ khóa tìm kiếm.</p>
+        <button class="btn-clear-filter" onclick="clearAllFilters()">Xóa bộ lọc</button>
+      </div>
+
+      <!-- Pagination -->
+      <div class="pagination" id="pagination"></div>
+    </main>
+  </div>
+
+  <!-- ── FOOTER ── -->
+  <footer>© 2024 Gia Hoà Phát – Nguyên liệu &amp; Dụng cụ làm bánh. Demo project – SWR302. Không có giao dịch thực.</footer>
+
+  <script src="scripts/main.js"></script>
+  <script>
+  (function() {
+    /* ───────────────────────────────────────────────
+       FALLBACK PRODUCTS if main.js hasn't loaded yet
+    ─────────────────────────────────────────────── */
+    const FALLBACK_PRODUCTS = [
+      {id:1,name:"Bột mì đa dụng Meizan 1kg",category:"bot",catName:"Bột làm bánh",price:25000,unit:"túi",brand:"Meizan",origin:"Việt Nam",stock:150,color:"#F5E6C8",isNew:false,emoji:"🌾"},
+      {id:2,name:"Bột mì số 8 Thành Long 1kg",category:"bot",catName:"Bột làm bánh",price:28000,unit:"túi",brand:"Thành Long",origin:"Việt Nam",stock:80,color:"#F0E0B0",isNew:false,emoji:"🌾"},
+      {id:3,name:"Đường cát trắng Biên Hòa 1kg",category:"duong",catName:"Đường & Chất tạo ngọt",price:22000,unit:"túi",brand:"Biên Hòa",origin:"Việt Nam",stock:200,color:"#FFF5D6",isNew:false,emoji:"🍬"},
+      {id:4,name:"Đường bột mịn 500g",category:"duong",catName:"Đường & Chất tạo ngọt",price:18000,unit:"túi",brand:"GHP",origin:"Việt Nam",stock:120,color:"#FAFAFA",isNew:true,emoji:"❄️"},
+      {id:5,name:"Bơ lạt Anchor 500g",category:"bo-sua",catName:"Bơ & Sữa",price:95000,unit:"hộp",brand:"Anchor",origin:"New Zealand",stock:60,color:"#FFF3C0",isNew:false,emoji:"🧈"},
+      {id:6,name:"Sữa đặc Ông Thọ 380g",category:"bo-sua",catName:"Bơ & Sữa",price:28000,unit:"lon",brand:"Vinamilk",origin:"Việt Nam",stock:150,color:"#FFF8E1",isNew:false,emoji:"🥛"},
+      {id:7,name:"Chocolate đen Valrhona 70% 500g",category:"chocolate",catName:"Chocolate",price:320000,unit:"gói",brand:"Valrhona",origin:"Pháp",stock:30,color:"#4A2C2A",isNew:true,emoji:"🍫"},
+      {id:8,name:"Chocolate sữa Callebaut 500g",category:"chocolate",catName:"Chocolate",price:285000,unit:"gói",brand:"Callebaut",origin:"Bỉ",stock:25,color:"#7B4F3B",isNew:false,emoji:"🍫"},
+      {id:9,name:"Màu thực phẩm gel AmeriColor bộ 12",category:"trang-tri",catName:"Nguyên liệu trang trí",price:185000,unit:"bộ",brand:"AmeriColor",origin:"Mỹ",stock:40,color:"#E8D5F5",isNew:true,emoji:"🎨"},
+      {id:10,name:"Sprinkle trang trí bánh hỗn hợp 100g",category:"trang-tri",catName:"Nguyên liệu trang trí",price:45000,unit:"hũ",brand:"Wilton",origin:"Mỹ",stock:80,color:"#FFE4E1",isNew:false,emoji:"✨"},
+      {id:11,name:"Khuôn bánh tròn 20cm",category:"dung-cu",catName:"Dụng cụ làm bánh",price:85000,unit:"cái",brand:"Wilton",origin:"Mỹ",stock:50,color:"#C0C0C0",isNew:false,emoji:"⭕"},
+      {id:12,name:"Túi bắt kem + 10 đui inox",category:"dung-cu",catName:"Dụng cụ làm bánh",price:65000,unit:"bộ",brand:"GHP",origin:"Việt Nam",stock:100,color:"#E8F5E9",isNew:false,emoji:"🎂"},
+      {id:13,name:"Máy đánh trứng Philips HR3705",category:"thiet-bi",catName:"Thiết bị làm bánh",price:850000,unit:"cái",brand:"Philips",origin:"Hà Lan",stock:15,color:"#FFECB3",isNew:false,emoji:"⚡"},
+      {id:14,name:"Lò nướng Electrolux EOT3818K 38L",category:"thiet-bi",catName:"Thiết bị làm bánh",price:1850000,unit:"cái",brand:"Electrolux",origin:"Thụy Điển",stock:8,color:"#E3F2FD",isNew:false,emoji:"🔥"},
+      {id:15,name:"Cân điện tử Tanita KD-321 5kg",category:"thiet-bi",catName:"Thiết bị làm bánh",price:650000,unit:"cái",brand:"Tanita",origin:"Nhật Bản",stock:20,color:"#F3E5F5",isNew:true,emoji:"⚖️"},
+      {id:16,name:"Bột nở (Baking Powder) Rumford 450g",category:"bot",catName:"Bột làm bánh",price:85000,unit:"hộp",brand:"Rumford",origin:"Mỹ",stock:60,color:"#E8F5E9",isNew:false,emoji:"💨"},
+      {id:17,name:"Muối biển mịn 500g",category:"duong",catName:"Đường & Chất tạo ngọt",price:12000,unit:"túi",brand:"GHP",origin:"Việt Nam",stock:300,color:"#F5F5F5",isNew:false,emoji:"🧂"},
+      {id:18,name:"Vani dạng lỏng Nielsen-Massey 60ml",category:"trang-tri",catName:"Nguyên liệu trang trí",price:220000,unit:"chai",brand:"Nielsen-Massey",origin:"Mỹ",stock:35,color:"#FFF8DC",isNew:false,emoji:"🌿"},
+      {id:19,name:"Kem tươi Anchor Whipping Cream 1L",category:"bo-sua",catName:"Bơ & Sữa",price:145000,unit:"hộp",brand:"Anchor",origin:"New Zealand",stock:0,color:"#FFFDE7",isNew:false,emoji:"🥛"},
+      {id:20,name:"Phẩm màu tự nhiên dạng bột bộ 8 màu",category:"trang-tri",catName:"Nguyên liệu trang trí",price:125000,unit:"bộ",brand:"GHP",origin:"Việt Nam",stock:55,color:"#FCE4EC",isNew:true,emoji:"🌈"}
+    ];
+
+    const DATA = (typeof PRODUCTS !== 'undefined' && PRODUCTS.length) ? PRODUCTS : FALLBACK_PRODUCTS;
+
+    /* ── Filter state ── */
+    const state = {
+      categories: [],
+      priceMin: 0,
+      priceMax: 2000000,
+      brands: [],
+      origins: [],
+      keyword: '',
+      sort: 'default',
+      page: 1,
+      perPage: 20
+    };
+
+    /* ── Derived lists ── */
+    const CATEGORIES = [
+      { val: 'all',       label: 'Tất cả' },
+      { val: 'bot',       label: 'Bột làm bánh' },
+      { val: 'duong',     label: 'Đường & Chất tạo ngọt' },
+      { val: 'bo-sua',    label: 'Bơ & Sữa' },
+      { val: 'chocolate', label: 'Chocolate' },
+      { val: 'trang-tri', label: 'Nguyên liệu trang trí' },
+      { val: 'dung-cu',   label: 'Dụng cụ làm bánh' },
+      { val: 'thiet-bi',  label: 'Thiết bị làm bánh' }
+    ];
+    const BRANDS  = [...new Set(DATA.map(p => p.brand))].sort();
+    const ORIGINS = [...new Set(DATA.map(p => p.origin))].sort();
+
+    /* ── Utility ── */
+    function fmtVND(n) {
+      if (typeof formatVND === 'function') return formatVND(n);
+      return n.toLocaleString('vi-VN') + ' ₫';
+    }
+
+    /* ── Build sidebar checkboxes ── */
+    function buildSidebar(container) {
+      // Categories
+      const catEl = container.querySelector('#catCheckboxes') || container.querySelector('.cat-checkboxes');
+      if (catEl) {
+        catEl.innerHTML = CATEGORIES.map(c => `
+          <label class="checkbox-label">
+            <input type="checkbox" name="cat" value="${c.val}" ${c.val === 'all' ? 'checked' : ''}
+              onchange="onCatChange(this)" />
+            ${c.label}
+          </label>`).join('');
+      }
+      // Brands
+      const brandEl = container.querySelector('#brandCheckboxes') || container.querySelector('.brand-checkboxes');
+      if (brandEl) {
+        brandEl.innerHTML = BRANDS.map(b => `
+          <label class="checkbox-label">
+            <input type="checkbox" name="brand" value="${b}" onchange="onBrandChange(this)" /> ${b}
+          </label>`).join('');
+      }
+      // Origins
+      const originEl = container.querySelector('#originCheckboxes') || container.querySelector('.origin-checkboxes');
+      if (originEl) {
+        originEl.innerHTML = ORIGINS.map(o => `
+          <label class="checkbox-label">
+            <input type="checkbox" name="origin" value="${o}" onchange="onOriginChange(this)" /> ${o}
+          </label>`).join('');
+      }
+    }
+
+    buildSidebar(document.getElementById('desktopSidebar'));
+
+    /* ── Build drawer filter content ── */
+    const drawerFilters = document.getElementById('drawerFilters');
+    drawerFilters.innerHTML = `
+      <div style="padding:1rem 1.2rem;border-bottom:1px solid #EDE5DB;">
+        <div style="font-weight:800;font-size:.9rem;margin-bottom:.7rem;">Danh mục</div>
+        <div class="checkbox-list cat-checkboxes"></div>
+      </div>
+      <div style="padding:1rem 1.2rem;border-bottom:1px solid #EDE5DB;">
+        <div style="font-weight:800;font-size:.9rem;margin-bottom:.7rem;">Thương hiệu</div>
+        <div class="checkbox-list brand-checkboxes"></div>
+      </div>
+      <div style="padding:1rem 1.2rem;">
+        <div style="font-weight:800;font-size:.9rem;margin-bottom:.7rem;">Xuất xứ</div>
+        <div class="checkbox-list origin-checkboxes"></div>
+      </div>`;
+    buildSidebar(drawerFilters);
+
+    /* ── Filter logic ── */
+    function getFiltered() {
+      let list = DATA.slice();
+
+      // Category
+      if (state.categories.length && !state.categories.includes('all')) {
+        list = list.filter(p => state.categories.includes(p.category));
+      }
+      // Price
+      list = list.filter(p => p.price >= state.priceMin && p.price <= state.priceMax);
+      // Brand
+      if (state.brands.length) list = list.filter(p => state.brands.includes(p.brand));
+      // Origin
+      if (state.origins.length) list = list.filter(p => state.origins.includes(p.origin));
+      // Keyword
+      if (state.keyword) {
+        const kw = state.keyword.toLowerCase();
+        list = list.filter(p => p.name.toLowerCase().includes(kw) || (p.catName && p.catName.toLowerCase().includes(kw)));
+      }
+      // Sort
+      if (state.sort === 'price_asc')  list.sort((a, b) => a.price - b.price);
+      if (state.sort === 'price_desc') list.sort((a, b) => b.price - a.price);
+      if (state.sort === 'newest')     list.sort((a, b) => (b.isNew ? 1 : 0) - (a.isNew ? 1 : 0));
+
+      return list;
+    }
+
+    /* ── Render ── */
+    function render() {
+      const all = getFiltered();
+      const total = all.length;
+      const totalPages = Math.max(1, Math.ceil(total / state.perPage));
+      if (state.page > totalPages) state.page = 1;
+      const start = (state.page - 1) * state.perPage;
+      const page  = all.slice(start, start + state.perPage);
+
+      // Results info
+      const showing = page.length;
+      document.getElementById('resultsInfo').innerHTML =
+        total ? `Hiển thị <strong>${showing}</strong> trong <strong>${total}</strong> sản phẩm` : '';
+
+      // Grid
+      const grid = document.getElementById('productGrid');
+      const empty = document.getElementById('emptyState');
+
+      if (!page.length) {
+        grid.innerHTML = '';
+        empty.style.display = 'block';
+      } else {
+        empty.style.display = 'none';
+        grid.innerHTML = page.map(p => `
+          <div class="product-card">
+            <div class="product-img-wrap">
+              <div class="placeholder-img" style="background:${p.color || '#FFF8F0'}">
+                <span>${p.emoji || '🛒'}</span>
+              </div>
+              <div class="product-badges">
+                ${p.isNew ? '<span class="badge-new">MỚI</span>' : ''}
+                ${p.stock === 0 ? '<span class="badge-out">HẾT HÀNG</span>' : ''}
+              </div>
+            </div>
+            <div class="product-info">
+              <div class="product-cat">${p.catName || ''}</div>
+              <div class="product-name">${p.name}</div>
+              <div class="product-unit">${p.unit ? '/ ' + p.unit : ''}</div>
+              <div class="product-price">${fmtVND(p.price)}</div>
+            </div>
+            <div class="product-actions">
+              <a href="product.html?id=${p.id}" class="btn-detail">Xem chi tiết</a>
+              <button class="btn-add-cart" ${p.stock === 0 ? 'disabled' : ''}
+                onclick="handleAddToCart(${p.id}, '${p.name.replace(/'/g, "\\'")}', ${p.price}, '${p.unit || ''}')">
+                ${p.stock === 0 ? 'Hết hàng' : 'Thêm vào giỏ'}
+              </button>
+            </div>
+          </div>`).join('');
+      }
+
+      // Pagination
+      renderPagination(state.page, totalPages);
+      renderActiveFilters();
+      updateURL();
+    }
+
+    /* ── Render pagination ── */
+    function renderPagination(cur, total) {
+      const el = document.getElementById('pagination');
+      if (total <= 1) { el.innerHTML = ''; return; }
+
+      let html = `<button class="page-btn nav" onclick="goPage(${cur - 1})" ${cur <= 1 ? 'disabled' : ''}>‹ Trước</button>`;
+      const range = [];
+      for (let i = 1; i <= total; i++) {
+        if (i === 1 || i === total || (i >= cur - 2 && i <= cur + 2)) range.push(i);
+        else if (range[range.length - 1] !== '...') range.push('...');
+      }
+      range.forEach(r => {
+        if (r === '...') html += `<span class="page-btn" style="cursor:default">…</span>`;
+        else html += `<button class="page-btn ${r === cur ? 'active' : ''}" onclick="goPage(${r})">${r}</button>`;
+      });
+      html += `<button class="page-btn nav" onclick="goPage(${cur + 1})" ${cur >= total ? 'disabled' : ''}>Tiếp ›</button>`;
+      el.innerHTML = html;
+    }
+
+    /* ── Active filter chips ── */
+    function renderActiveFilters() {
+      const chips = [];
+      state.categories.filter(c => c !== 'all').forEach(c => {
+        const label = CATEGORIES.find(x => x.val === c)?.label || c;
+        chips.push(`<span class="filter-chip">${label}<button onclick="removeFilter('cat','${c}')">✕</button></span>`);
+      });
+      if (state.priceMax < 2000000 || state.priceMin > 0) {
+        chips.push(`<span class="filter-chip">${fmtVND(state.priceMin)} – ${fmtVND(state.priceMax)}<button onclick="removeFilter('price',null)">✕</button></span>`);
+      }
+      state.brands.forEach(b => {
+        chips.push(`<span class="filter-chip">${b}<button onclick="removeFilter('brand','${b}')">✕</button></span>`);
+      });
+      state.origins.forEach(o => {
+        chips.push(`<span class="filter-chip">${o}<button onclick="removeFilter('origin','${o}')">✕</button></span>`);
+      });
+      if (state.keyword) {
+        chips.push(`<span class="filter-chip">Từ khoá: "${state.keyword}"<button onclick="removeFilter('keyword',null)">✕</button></span>`);
+      }
+      document.getElementById('activeFilters').innerHTML = chips.join('');
+    }
+
+    /* ── URL sync ── */
+    function updateURL() {
+      const params = new URLSearchParams();
+      if (state.categories.length && !state.categories.includes('all')) params.set('cat', state.categories.join(','));
+      if (state.priceMin > 0) params.set('priceMin', state.priceMin);
+      if (state.priceMax < 2000000) params.set('priceMax', state.priceMax);
+      if (state.brands.length) params.set('brand', state.brands.join(','));
+      if (state.origins.length) params.set('origin', state.origins.join(','));
+      if (state.keyword) params.set('q', state.keyword);
+      if (state.sort !== 'default') params.set('sort', state.sort);
+      if (state.page > 1) params.set('page', state.page);
+      const qs = params.toString();
+      history.pushState({}, '', qs ? '?' + qs : window.location.pathname);
+    }
+
+    function loadFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get('cat')) state.categories = params.get('cat').split(',');
+      if (params.get('priceMin')) state.priceMin = parseInt(params.get('priceMin'));
+      if (params.get('priceMax')) state.priceMax = parseInt(params.get('priceMax'));
+      if (params.get('brand')) state.brands = params.get('brand').split(',');
+      if (params.get('origin')) state.origins = params.get('origin').split(',');
+      if (params.get('q')) { state.keyword = params.get('q'); document.getElementById('keywordInput').value = state.keyword; }
+      if (params.get('sort')) { state.sort = params.get('sort'); document.getElementById('sortSelect').value = state.sort; }
+      if (params.get('page')) state.page = parseInt(params.get('page'));
+      // Sync checkboxes
+      syncCheckboxes();
+      syncPriceUI();
+    }
+
+    function syncCheckboxes() {
+      document.querySelectorAll('input[name="cat"]').forEach(cb => {
+        if (state.categories.includes('all') || state.categories.length === 0) {
+          cb.checked = cb.value === 'all';
+        } else {
+          cb.checked = state.categories.includes(cb.value);
+        }
+      });
+      document.querySelectorAll('input[name="brand"]').forEach(cb => { cb.checked = state.brands.includes(cb.value); });
+      document.querySelectorAll('input[name="origin"]').forEach(cb => { cb.checked = state.origins.includes(cb.value); });
+    }
+
+    function syncPriceUI() {
+      document.getElementById('priceRange').value = state.priceMax;
+      document.getElementById('priceMin').value = state.priceMin;
+      document.getElementById('priceMax').value = state.priceMax;
+      document.getElementById('priceDisplay').textContent = fmtVND(state.priceMin) + ' – ' + fmtVND(state.priceMax);
+    }
+
+    /* ── Event handlers (global scope) ── */
+    window.onCatChange = function(cb) {
+      if (cb.value === 'all') {
+        state.categories = [];
+        document.querySelectorAll('input[name="cat"]').forEach(el => { el.checked = el.value === 'all'; });
+      } else {
+        // Uncheck "all"
+        document.querySelectorAll('input[name="cat"][value="all"]').forEach(el => el.checked = false);
+        if (cb.checked) state.categories.push(cb.value);
+        else state.categories = state.categories.filter(c => c !== cb.value);
+        // Sync both desktop and drawer
+        document.querySelectorAll(`input[name="cat"][value="${cb.value}"]`).forEach(el => el.checked = cb.checked);
+      }
+      state.page = 1; render();
+    };
+
+    window.onBrandChange = function(cb) {
+      if (cb.checked) state.brands.push(cb.value);
+      else state.brands = state.brands.filter(b => b !== cb.value);
+      document.querySelectorAll(`input[name="brand"][value="${cb.value}"]`).forEach(el => el.checked = cb.checked);
+      state.page = 1; render();
+    };
+
+    window.onOriginChange = function(cb) {
+      if (cb.checked) state.origins.push(cb.value);
+      else state.origins = state.origins.filter(o => o !== cb.value);
+      document.querySelectorAll(`input[name="origin"][value="${cb.value}"]`).forEach(el => el.checked = cb.checked);
+      state.page = 1; render();
+    };
+
+    window.onRangeChange = function(val) {
+      state.priceMax = parseInt(val);
+      document.getElementById('priceMax').value = val;
+      document.getElementById('priceDisplay').textContent = fmtVND(state.priceMin) + ' – ' + fmtVND(state.priceMax);
+      state.page = 1; render();
+    };
+
+    window.onMinInput = function(val) {
+      state.priceMin = parseInt(val) || 0;
+      document.getElementById('priceDisplay').textContent = fmtVND(state.priceMin) + ' – ' + fmtVND(state.priceMax);
+      state.page = 1; render();
+    };
+
+    window.onMaxInput = function(val) {
+      const v = parseInt(val) || 2000000;
+      state.priceMax = Math.min(v, 2000000);
+      document.getElementById('priceRange').value = state.priceMax;
+      document.getElementById('priceDisplay').textContent = fmtVND(state.priceMin) + ' – ' + fmtVND(state.priceMax);
+      state.page = 1; render();
+    };
+
+    window.applySearch = function() {
+      state.keyword = document.getElementById('keywordInput').value.trim();
+      state.page = 1; render();
+    };
+
+    window.applyHeaderSearch = function() {
+      const val = document.getElementById('headerSearchInput').value.trim();
+      if (val) {
+        document.getElementById('keywordInput').value = val;
+        state.keyword = val;
+        state.page = 1; render();
+      }
+    };
+
+    window.applySort = function() {
+      state.sort = document.getElementById('sortSelect').value;
+      state.page = 1; render();
+    };
+
+    window.goPage = function(n) {
+      const all = getFiltered();
+      const totalPages = Math.ceil(all.length / state.perPage);
+      if (n < 1 || n > totalPages) return;
+      state.page = n;
+      render();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+
+    window.clearAllFilters = function() {
+      state.categories = [];
+      state.priceMin = 0;
+      state.priceMax = 2000000;
+      state.brands = [];
+      state.origins = [];
+      state.keyword = '';
+      state.sort = 'default';
+      state.page = 1;
+      document.getElementById('keywordInput').value = '';
+      document.getElementById('sortSelect').value = 'default';
+      document.getElementById('priceRange').value = 2000000;
+      document.getElementById('priceMin').value = 0;
+      document.getElementById('priceMax').value = 2000000;
+      document.getElementById('priceDisplay').textContent = fmtVND(0) + ' – ' + fmtVND(2000000);
+      syncCheckboxes();
+      render();
+    };
+
+    window.removeFilter = function(type, val) {
+      if (type === 'cat') state.categories = state.categories.filter(c => c !== val);
+      else if (type === 'price') { state.priceMin = 0; state.priceMax = 2000000; syncPriceUI(); }
+      else if (type === 'brand') state.brands = state.brands.filter(b => b !== val);
+      else if (type === 'origin') state.origins = state.origins.filter(o => o !== val);
+      else if (type === 'keyword') state.keyword = '';
+      syncCheckboxes();
+      state.page = 1; render();
+    };
+
+    /* ── Add to cart handler ── */
+    window.handleAddToCart = function(id, name, price, unit) {
+      if (typeof addToCart === 'function') {
+        addToCart({ id, name, price, unit, qty: 1 });
+      } else {
+        // Fallback
+        const cart = JSON.parse(localStorage.getItem('ghp_cart') || '[]');
+        const existing = cart.find(i => i.id === id);
+        if (existing) existing.qty++;
+        else cart.push({ id, name, price, unit, qty: 1 });
+        localStorage.setItem('ghp_cart', JSON.stringify(cart));
+        const total = cart.reduce((s, i) => s + i.qty, 0);
+        const badge = document.getElementById('cartCount');
+        if (badge) badge.textContent = total;
+      }
+      if (typeof showToast === 'function') {
+        showToast('✅ Đã thêm "' + name + '" vào giỏ hàng!', 'success');
+      }
+    };
+
+    /* ── Filter drawer ── */
+    window.openFilterDrawer = function() {
+      document.getElementById('filterDrawer').classList.add('open');
+      document.getElementById('filterOverlay').classList.add('open');
+      document.body.style.overflow = 'hidden';
+    };
+    window.closeFilterDrawer = function() {
+      document.getElementById('filterDrawer').classList.remove('open');
+      document.getElementById('filterOverlay').classList.remove('open');
+      document.body.style.overflow = '';
+    };
+
+    /* ── Section toggle ── */
+    window.toggleSection = function(titleEl) {
+      titleEl.classList.toggle('collapsed');
+      const body = titleEl.nextElementSibling;
+      body.classList.toggle('collapsed');
+    };
+
+    /* ── Auth header ── */
+    function updateAuthLink() {
+      try {
+        const u = JSON.parse(sessionStorage.getItem('ghp_user'));
+        if (u && u.name) {
+          const link = document.getElementById('authLink');
+          if (link) { link.textContent = u.name.split(' ').pop(); link.href = 'account.html'; }
+        }
+      } catch {}
+    }
+
+    /* ── Cart count ── */
+    function initCartCount() {
+      if (typeof updateCartCount === 'function') { updateCartCount(); return; }
+      try {
+        const cart = JSON.parse(localStorage.getItem('ghp_cart') || '[]');
+        const total = cart.reduce((s, i) => s + (i.qty || 1), 0);
+        const badge = document.getElementById('cartCount');
+        if (badge) badge.textContent = total;
+      } catch {}
+    }
+
+    /* ── Keyboard search ── */
+    document.getElementById('keywordInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') window.applySearch();
+    });
+    document.getElementById('headerSearchInput').addEventListener('keydown', function(e) {
+      if (e.key === 'Enter') window.applyHeaderSearch();
+    });
+
+    /* ── Init ── */
+    loadFromURL();
+    updateAuthLink();
+    initCartCount();
+    render();
+
+  })();
+  </script>
+</body>
+</html>

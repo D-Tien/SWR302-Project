@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đơn hàng của tôi – Gia Hoa Phat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../styles/main.css" />
+  <style>
+    *,*::before,*::after{box-sizing:border-box;}
+    body{font-family:'Nunito',sans-serif;background:#FAF7F4;color:#332A25;margin:0;}
+    .header-top{background:#D97745;color:#fff;text-align:center;padding:6px 16px;font-size:12px;font-weight:600;display:flex;justify-content:center;gap:28px;flex-wrap:wrap;}
+    .header-main{background:#fff;border-bottom:2px solid #EDE5DB;padding:12px 16px;}
+    .header-inner{max-width:1100px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;}
+    .logo{display:flex;align-items:center;gap:10px;text-decoration:none;}
+    .logo-icon{font-size:30px;}
+    .logo-title{display:block;font-family:'Playfair Display',serif;font-size:22px;font-weight:700;color:#D97745;line-height:1;}
+    .logo-sub{display:block;font-size:11px;color:#789B75;font-weight:600;}
+    .header-actions{display:flex;align-items:center;gap:14px;}
+    .cart-btn{font-size:22px;text-decoration:none;position:relative;}
+    .cart-badge{position:absolute;top:-6px;right:-8px;background:#D97745;color:#fff;border-radius:50%;width:18px;height:18px;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;}
+
+    .account-layout{display:grid;grid-template-columns:260px 1fr;gap:24px;max-width:1100px;margin:32px auto;padding:0 16px;align-items:start;}
+    @media(max-width:768px){.account-layout{grid-template-columns:1fr;}}
+
+    .account-sidebar{background:#fff;border-radius:12px;border:1px solid #EDE5DB;overflow:hidden;box-shadow:0 2px 8px rgba(51,42,37,.06);}
+    .sidebar-header{background:#D97745;color:#fff;padding:20px 20px 16px;}
+    .sidebar-header .avatar-circle{width:56px;height:56px;border-radius:50%;background:rgba(255,255,255,.25);display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:700;color:#fff;margin-bottom:10px;}
+    .sidebar-header .user-name{font-weight:700;font-size:15px;}
+    .sidebar-header .user-email{font-size:12px;opacity:.85;}
+    .sidebar-section-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#999;padding:14px 20px 6px;}
+    .sidebar-menu{list-style:none;padding:0 0 12px;margin:0;}
+    .sidebar-menu li a{display:flex;align-items:center;gap:10px;padding:11px 20px;font-size:14px;font-weight:600;color:#332A25;text-decoration:none;transition:background .15s,color .15s;}
+    .sidebar-menu li a:hover{background:#FFF8F0;color:#D97745;}
+    .sidebar-menu li a.active{background:#FFF3EA;color:#D97745;border-left:3px solid #D97745;}
+    .sidebar-menu li a .menu-icon{font-size:16px;width:20px;text-align:center;}
+
+    .account-card{background:#fff;border-radius:12px;border:1px solid #EDE5DB;box-shadow:0 2px 8px rgba(51,42,37,.06);padding:32px;}
+    .card-header{margin-bottom:20px;padding-bottom:16px;border-bottom:2px solid #EDE5DB;}
+    .card-header h2{font-family:'Playfair Display',serif;font-size:22px;color:#332A25;margin:0;}
+
+    /* Filter Tabs */
+    .filter-tabs{display:flex;gap:8px;overflow-x:auto;padding-bottom:8px;margin-bottom:20px;border-bottom:1px solid #EDE5DB;-webkit-overflow-scrolling:touch;}
+    .tab-btn{background:none;border:none;padding:8px 14px;border-radius:20px;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;color:#666;cursor:pointer;white-space:nowrap;transition:all .2s;}
+    .tab-btn:hover{background:#FFF8F0;color:#D97745;}
+    .tab-btn.active{background:#D97745;color:#fff;}
+
+    /* Order cards */
+    .order-list{display:flex;flex-direction:column;gap:18px;}
+    .order-card{border:1px solid #EDE5DB;border-radius:12px;overflow:hidden;background:#fff;transition:box-shadow .2s;}
+    .order-card:hover{box-shadow:0 4px 12px rgba(51,42,37,.08);}
+
+    .order-card-header{background:#FAF7F4;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-bottom:1px solid #EDE5DB;flex-wrap:wrap;gap:10px;}
+    .order-id-group{display:flex;align-items:center;gap:12px;}
+    .order-id{font-weight:800;font-size:15px;color:#332A25;}
+    .order-date{font-size:13px;color:#777;}
+    .badges-group{display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+
+    /* Badges */
+    .status-badge{display:inline-flex;align-items:center;gap:4px;padding:3px 10px;border-radius:20px;font-size:12px;font-weight:700;}
+    .status-Pending{background:#FFF3E0;color:#E65100;border:1px solid #FFE0B2;} /* orange */
+    .status-Confirmed{background:#E3F2FD;color:#1565C0;border:1px solid #BBDEFB;} /* blue */
+    .status-Preparing{background:#F3E5F5;color:#7B1FA2;border:1px solid #E1BEE7;} /* purple */
+    .status-Shipping{background:#E0F7FA;color:#00838F;border:1px solid #B2EBF2;} /* cyan */
+    .status-Completed{background:#E8F5E9;color:#2E7D32;border:1px solid #C8E6C9;} /* green */
+    .status-Cancelled{background:#EEEEEE;color:#616161;border:1px solid #E0E0E0;} /* gray */
+
+    .payment-badge{display:inline-flex;align-items:center;padding:3px 8px;border-radius:14px;font-size:11px;font-weight:700;}
+    .pay-Paid{background:#E8F5E9;color:#2E7D32;}
+    .pay-Unpaid{background:#FFEBEE;color:#C62828;}
+
+    /* Order items preview */
+    .order-card-body{padding:16px 20px;}
+    .order-item-row{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px dashed #EDE5DB;font-size:14px;}
+    .order-item-row:last-child{border-bottom:none;}
+    .item-name-info{font-weight:600;color:#332A25;}
+    .item-qty-tag{font-size:12px;color:#888;margin-left:6px;}
+    .item-subtotal{font-weight:700;color:#332A25;}
+
+    .cancellation-status-box{margin-top:12px;padding:10px 14px;border-radius:8px;font-size:13px;display:flex;align-items:center;gap:8px;}
+    .cancel-sent{background:#FFF3E0;color:#E65100;border:1px solid #FFE0B2;}
+    .cancel-approved{background:#EEEEEE;color:#616161;border:1px solid #E0E0E0;}
+    .cancel-rejected{background:#FFEBEE;color:#C62828;border:1px solid #FFCDD2;}
+
+    /* Order card footer */
+    .order-card-footer{background:#fff;padding:14px 20px;display:flex;align-items:center;justify-content:space-between;border-top:1px solid #EDE5DB;flex-wrap:wrap;gap:12px;}
+    .total-amount-box{font-size:14px;color:#666;}
+    .total-amount-box strong{font-size:18px;color:#D97745;margin-left:4px;}
+    .actions-group{display:flex;align-items:center;gap:10px;}
+
+    .btn-view{background:#FFF8F0;color:#D97745;border:1.5px solid #D97745;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;text-decoration:none;transition:all .2s;display:inline-flex;align-items:center;gap:6px;}
+    .btn-view:hover{background:#D97745;color:#fff;}
+    .btn-cancel{background:#fff;color:#d32f2f;border:1.5px solid #d32f2f;border-radius:8px;padding:8px 14px;font-size:13px;font-weight:700;font-family:'Nunito',sans-serif;cursor:pointer;transition:all .2s;}
+    .btn-cancel:hover{background:#FFEBEE;}
+
+    .empty-state{text-align:center;padding:50px 20px;color:#888;}
+    .empty-icon{font-size:48px;margin-bottom:12px;}
+    .empty-state p{font-size:15px;margin:0 0 16px;}
+    .btn-shop{background:#D97745;color:#fff;text-decoration:none;padding:10px 24px;border-radius:8px;font-weight:700;display:inline-block;}
+
+    /* Cancellation Modal */
+    .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);z-index:1000;display:flex;align-items:center;justify-content:center;padding:16px;}
+    .modal-overlay.hidden{display:none;}
+    .modal-box{background:#fff;border-radius:16px;width:100%;max-width:480px;padding:28px;position:relative;}
+    .modal-box h3{font-family:'Playfair Display',serif;font-size:20px;color:#332A25;margin:0 0 16px;}
+    .modal-close{position:absolute;top:16px;right:18px;background:none;border:none;font-size:22px;cursor:pointer;color:#888;}
+    .form-group{margin-bottom:16px;}
+    .form-group label{display:block;font-size:13px;font-weight:700;color:#332A25;margin-bottom:6px;}
+    .form-group textarea{width:100%;padding:10px 14px;border-radius:8px;border:1.5px solid #EDE5DB;font-size:14px;font-family:'Nunito',sans-serif;color:#332A25;background:#fff;resize:vertical;min-height:90px;box-sizing:border-box;}
+    .form-group textarea:focus{outline:none;border-color:#D97745;box-shadow:0 0 0 3px rgba(217,119,69,.12);}
+    .modal-actions{display:flex;gap:10px;justify-content:flex-end;margin-top:20px;}
+    .btn-secondary{background:#fff;color:#332A25;border:1.5px solid #EDE5DB;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;}
+    .btn-primary{background:#D97745;color:#fff;border:none;border-radius:8px;padding:10px 20px;font-size:13px;font-weight:700;cursor:pointer;font-family:'Nunito',sans-serif;}
+    .btn-primary:hover{background:#c4612d;}
+
+    .staff-banner{background:#FFF3E0;border:1.5px solid #FFB74D;border-radius:10px;padding:14px 20px;color:#E65100;font-weight:600;font-size:14px;margin-bottom:16px;display:none;}
+    .staff-banner.show{display:block;}
+
+    .toast-container{position:fixed;top:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px;}
+    .toast{background:#fff;border-radius:10px;padding:14px 20px;box-shadow:0 4px 20px rgba(0,0,0,.14);font-size:14px;font-weight:600;display:flex;align-items:center;gap:10px;min-width:260px;animation:slideInRight .3s ease;border-left:4px solid #D97745;}
+    .toast.success{border-left-color:#4CAF50;}
+    .toast.error{border-left-color:#f44336;}
+    @keyframes slideInRight{from{opacity:0;transform:translateX(40px)}to{opacity:1;transform:none}}
+  </style>
+</head>
+<body>
+
+<header>
+  <div class="header-top">
+    <span>🚚 Giao hàng toàn quốc</span>
+    <span>📞 Hotline: 1800-GHP</span>
+    <span>🕐 Thứ 2 – Thứ 7: 8:00 – 17:30</span>
+  </div>
+  <div class="header-main">
+    <div class="header-inner">
+      <a href="../index.html" class="logo">
+        <span class="logo-icon">🎂</span>
+        <div><span class="logo-title">GHP</span><span class="logo-sub">Gia Hoà Phát</span></div>
+      </a>
+      <div class="header-actions">
+        <div id="authArea"></div>
+        <a href="../cart.html" class="cart-btn">🛒 <span id="cartCount" class="cart-badge">0</span></a>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="toast-container" id="toastContainer"></div>
+
+<div style="max-width:1100px;margin:0 auto;padding:0 16px;">
+  <div class="staff-banner" id="staffBanner">⚠️ Đây là tài khoản nhân viên. Vui lòng đăng nhập tài khoản khách hàng để xem đơn hàng.</div>
+</div>
+
+<div class="account-layout">
+  <aside class="account-sidebar">
+    <div class="sidebar-header">
+      <div class="avatar-circle" id="sidebarAvatar">?</div>
+      <div class="user-name" id="sidebarName">Đang tải...</div>
+      <div class="user-email" id="sidebarEmail"></div>
+    </div>
+    <div class="sidebar-section-label">Tài khoản của tôi</div>
+    <ul class="sidebar-menu">
+      <li><a href="profile.html"><span class="menu-icon">👤</span> Thông tin cá nhân</a></li>
+      <li><a href="change-password.html"><span class="menu-icon">🔑</span> Đổi mật khẩu</a></li>
+      <li><a href="addresses.html"><span class="menu-icon">📍</span> Địa chỉ giao hàng</a></li>
+      <li><a href="orders.html" class="active"><span class="menu-icon">📋</span> Đơn hàng của tôi</a></li>
+    </ul>
+  </aside>
+
+  <main class="account-card">
+    <div class="card-header">
+      <h2>📋 Đơn hàng của tôi</h2>
+    </div>
+
+    <!-- Filter tabs -->
+    <div class="filter-tabs" id="filterTabs">
+      <button class="tab-btn active" data-status="ALL">Tất cả</button>
+      <button class="tab-btn" data-status="Pending">Chờ xác nhận</button>
+      <button class="tab-btn" data-status="Confirmed">Đã xác nhận</button>
+      <button class="tab-btn" data-status="Preparing">Đang chuẩn bị</button>
+      <button class="tab-btn" data-status="Shipping">Đang giao</button>
+      <button class="tab-btn" data-status="Completed">Hoàn thành</button>
+      <button class="tab-btn" data-status="Cancelled">Đã huỷ</button>
+    </div>
+
+    <!-- Orders list container -->
+    <div id="orderList" class="order-list"></div>
+  </main>
+</div>
+
+<!-- Modal Cancellation -->
+<div class="modal-overlay hidden" id="cancelModal">
+  <div class="modal-box">
+    <button class="modal-close" onclick="closeCancelModal()">✕</button>
+    <h3>Yêu cầu huỷ đơn hàng</h3>
+    <p style="font-size:13px;color:#666;margin-top:0;">Mã đơn: <strong id="modalCancelOrderId"></strong></p>
+    <form id="cancelForm">
+      <div class="form-group">
+        <label for="cancelReason">Lý do huỷ đơn hàng <span style="color:#D97745">*</span></label>
+        <textarea id="cancelReason" placeholder="Vui lòng nhập lý do muốn huỷ đơn hàng..."></textarea>
+      </div>
+      <div class="modal-actions">
+        <button type="button" class="btn-secondary" onclick="closeCancelModal()">Đóng</button>
+        <button type="submit" class="btn-primary">Gửi yêu cầu huỷ</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<footer style="text-align:center;padding:28px 16px;font-size:12px;color:#999;margin-top:40px;border-top:1px solid #EDE5DB;">
+  © 2024 Gia Hoà Phát – Demo prototype.
+</footer>
+
+<script src="../scripts/main.js" defer></script>
+<script>
+  const SAMPLE_ORDERS = [
+    {
+      id: "GHP00000001",
+      userId: 1,
+      items: [
+        { productId: 1, name: "Bột mì đa dụng Meizan 1kg", qty: 2, price: 25000, unit: "túi" },
+        { productId: 5, name: "Bơ nhạt Anchor 200g", qty: 1, price: 45000, unit: "hộp" }
+      ],
+      contact: { name: "Nguyễn Thị Lan", phone: "0901234567" },
+      address: "123 Nguyễn Trãi, Phường 2, Quận 1, TP. Hồ Chí Minh",
+      deliveryFee: 20000,
+      subtotal: 95000,
+      total: 115000,
+      paymentMethod: "COD",
+      orderStatus: "Completed",
+      paymentStatus: "Paid",
+      createdAt: "2024-10-15T09:00:00",
+      cancellationRequest: null,
+      timeline: [
+        { status: "Pending", time: "2024-10-15T09:00:00" },
+        { status: "Confirmed", time: "2024-10-15T10:30:00" },
+        { status: "Preparing", time: "2024-10-15T14:00:00" },
+        { status: "Shipping", time: "2024-10-16T08:00:00" },
+        { status: "Completed", time: "2024-10-17T15:00:00" }
+      ]
+    },
+    {
+      id: "GHP00000002",
+      userId: 1,
+      items: [
+        { productId: 8, name: "Socola đen Valrhona 100g", qty: 1, price: 85000, unit: "thanh" },
+        { productId: 9, name: "Bột cacao Dutchess 250g", qty: 2, price: 65000, unit: "hộp" }
+      ],
+      contact: { name: "Nguyễn Thị Lan", phone: "0901234567" },
+      address: "123 Nguyễn Trãi, Phường 2, Quận 1, TP. Hồ Chí Minh",
+      deliveryFee: 20000,
+      subtotal: 215000,
+      total: 235000,
+      paymentMethod: "COD",
+      orderStatus: "Shipping",
+      paymentStatus: "Unpaid",
+      createdAt: "2024-11-01T14:30:00",
+      cancellationRequest: null,
+      timeline: [
+        { status: "Pending", time: "2024-11-01T14:30:00" },
+        { status: "Confirmed", time: "2024-11-01T16:00:00" },
+        { status: "Preparing", time: "2024-11-02T09:00:00" },
+        { status: "Shipping", time: "2024-11-03T08:00:00" }
+      ]
+    },
+    {
+      id: "GHP00000003",
+      userId: 1,
+      items: [
+        { productId: 16, name: "Máy đánh trứng cầm tay 200W", qty: 1, price: 350000, unit: "cái" }
+      ],
+      contact: { name: "Nguyễn Thị Lan", phone: "0901234567" },
+      address: "123 Nguyễn Trãi, Phường 2, Quận 1, TP. Hồ Chí Minh",
+      deliveryFee: 20000,
+      subtotal: 350000,
+      total: 370000,
+      paymentMethod: "COD",
+      orderStatus: "Pending",
+      paymentStatus: "Unpaid",
+      createdAt: "2024-11-10T11:00:00",
+      cancellationRequest: null,
+      timeline: [
+        { status: "Pending", time: "2024-11-10T11:00:00" }
+      ]
+    },
+    {
+      id: "GHP00000004",
+      userId: 1,
+      items: [
+        { productId: 3, name: "Đường cát trắng Biên Hòa 1kg", qty: 3, price: 22000, unit: "túi" }
+      ],
+      contact: { name: "Nguyễn Thị Lan", phone: "0901234567" },
+      address: "123 Nguyễn Trãi, Phường 2, Quận 1, TP. Hồ Chí Minh",
+      deliveryFee: 20000,
+      subtotal: 66000,
+      total: 86000,
+      paymentMethod: "COD",
+      orderStatus: "Cancelled",
+      paymentStatus: "Unpaid",
+      createdAt: "2024-10-01T16:00:00",
+      cancellationRequest: {
+        reason: "Đặt nhầm sản phẩm",
+        status: "Approved",
+        decidedAt: "2024-10-01T17:00:00"
+      },
+      timeline: [
+        { status: "Pending", time: "2024-10-01T16:00:00" },
+        { status: "Cancelled", time: "2024-10-01T17:00:00", note: "Khách yêu cầu huỷ: Đặt nhầm sản phẩm" }
+      ]
+    }
+  ];
+
+  const STATUS_LABELS = {
+    Pending: "Chờ xác nhận",
+    Confirmed: "Đã xác nhận",
+    Preparing: "Đang chuẩn bị",
+    Shipping: "Đang giao",
+    Completed: "Hoàn thành",
+    Cancelled: "Đã huỷ"
+  };
+
+  const PAYMENT_LABELS = {
+    Paid: "Đã thanh toán",
+    Unpaid: "Chưa thanh toán"
+  };
+
+  let currentTab = "ALL";
+  let activeCancelOrderId = null;
+  let currentUser = null;
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const raw = sessionStorage.getItem("ghp_user");
+    if (!raw) {
+      window.location.href = "../login.html";
+      return;
+    }
+    currentUser = JSON.parse(raw);
+
+    if (currentUser.role !== "customer") {
+      document.getElementById("staffBanner").classList.add("show");
+    }
+
+    const initials = getInitials(currentUser.name);
+    document.getElementById("sidebarAvatar").textContent = initials;
+    document.getElementById("sidebarName").textContent = currentUser.name;
+    document.getElementById("sidebarEmail").textContent = currentUser.email;
+
+    const authArea = document.getElementById("authArea");
+    if (authArea) {
+      authArea.innerHTML = `<span style="font-weight:600;font-size:14px;">👋 ${currentUser.name}</span>
+        <button onclick="sessionStorage.removeItem('ghp_user');window.location.href='../login.html'" style="margin-left:12px;background:none;border:1px solid #EDE5DB;border-radius:6px;padding:5px 12px;cursor:pointer;font-size:13px;font-family:'Nunito',sans-serif;">Đăng xuất</button>`;
+    }
+    try {
+      const cart = JSON.parse(localStorage.getItem("ghp_cart") || "[]");
+      document.getElementById("cartCount").textContent = cart.reduce((s, i) => s + (i.qty || 0), 0);
+    } catch (e) {}
+
+    // Init sample orders into localStorage if needed
+    initOrdersStorage();
+
+    // Bind tab clicks
+    document.querySelectorAll(".tab-btn").forEach(btn => {
+      btn.addEventListener("click", () => {
+        document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        currentTab = btn.getAttribute("data-status");
+        renderOrders();
+      });
+    });
+
+    // Form cancel submit
+    document.getElementById("cancelForm").addEventListener("submit", handleCancelSubmit);
+
+    renderOrders();
+  });
+
+  function getInitials(name) {
+    if (!name) return "?";
+    const parts = name.trim().split(/\s+/);
+    return parts.length >= 2 ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase() : name[0].toUpperCase();
+  }
+
+  function initOrdersStorage() {
+    let orders = [];
+    try {
+      orders = JSON.parse(localStorage.getItem("ghp_orders") || "[]");
+    } catch (e) {
+      orders = [];
+    }
+    if (!Array.isArray(orders)) orders = [];
+
+    // Ensure sample orders are present if not already added
+    let updated = false;
+    SAMPLE_ORDERS.forEach(sample => {
+      if (!orders.some(o => o.id === sample.id)) {
+        orders.push(sample);
+        updated = true;
+      }
+    });
+
+    if (updated || !localStorage.getItem("ghp_orders")) {
+      localStorage.setItem("ghp_orders", JSON.stringify(orders));
+    }
+  }
+
+  function getAllOrders() {
+    let orders = [];
+    try {
+      orders = JSON.parse(localStorage.getItem("ghp_orders") || "[]");
+    } catch (e) {
+      orders = [];
+    }
+    return Array.isArray(orders) ? orders : [];
+  }
+
+  function formatMoney(amount) {
+    if (typeof formatVND === "function") return formatVND(amount);
+    return new Intl.NumberFormat("vi-VN").format(amount) + " ₫";
+  }
+
+  function formatDate(isoStr) {
+    if (!isoStr) return "";
+    try {
+      const d = new Date(isoStr);
+      return d.toLocaleDateString("vi-VN", {
+        day: "2-digit",
+        month: "2-digit",
+        year: "numeric",
+        hour: "2-digit",
+        minute: "2-digit"
+      });
+    } catch (e) {
+      return isoStr;
+    }
+  }
+
+  function renderOrders() {
+    const list = document.getElementById("orderList");
+    const all = getAllOrders();
+
+    // Filter by user (userId or matching email/phone/contact)
+    const userOrders = all.filter(o => {
+      if (o.userId && currentUser.id && o.userId === currentUser.id) return true;
+      if (o.contact && currentUser.email && o.contact.email === currentUser.email) return true;
+      if (o.contact && currentUser.phone && o.contact.phone === currentUser.phone) return true;
+      // Default fallback for demo: if demo user has id 1 or name matches
+      if (currentUser.id === 1 || o.userId === 1) return true;
+      return false;
+    });
+
+    // Filter by tab
+    const filtered = userOrders.filter(o => {
+      if (currentTab === "ALL") return true;
+      return o.orderStatus === currentTab;
+    });
+
+    if (filtered.length === 0) {
+      list.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-icon">📦</div>
+          <p>Bạn chưa có đơn hàng nào${currentTab !== "ALL" ? " ở trạng thái này" : ""}.</p>
+          <a href="../catalog.html" class="btn-shop">Khám phá sản phẩm ngay</a>
+        </div>
+      `;
+      return;
+    }
+
+    // Sort newest first
+    filtered.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0));
+
+    list.innerHTML = filtered.map(order => {
+      const statusLabel = STATUS_LABELS[order.orderStatus] || order.orderStatus;
+      const paymentLabel = PAYMENT_LABELS[order.paymentStatus] || order.paymentStatus;
+      const canCancel = (order.orderStatus === "Pending" || order.orderStatus === "Confirmed") && !order.cancellationRequest;
+
+      let cancelNotice = "";
+      if (order.cancellationRequest) {
+        if (order.cancellationRequest.status === "Pending" || !order.cancellationRequest.status) {
+          cancelNotice = `<div class="cancellation-status-box cancel-sent">⏳ <strong>Đã gửi yêu cầu huỷ</strong>: Chờ cửa hàng xử lý (Lý do: ${order.cancellationRequest.reason || ""})</div>`;
+        } else if (order.cancellationRequest.status === "Approved") {
+          cancelNotice = `<div class="cancellation-status-box cancel-approved">✓ <strong>Yêu cầu huỷ được chấp nhận</strong> (Lý do: ${order.cancellationRequest.reason || ""})</div>`;
+        } else if (order.cancellationRequest.status === "Rejected") {
+          cancelNotice = `<div class="cancellation-status-box cancel-rejected">✕ <strong>Yêu cầu huỷ bị từ chối</strong>: Đơn hàng tiếp tục được giao.</div>`;
+        }
+      }
+
+      const itemsHtml = (order.items || []).map(item => `
+        <div class="order-item-row">
+          <div class="item-name-info">
+            ${item.name}
+            <span class="item-qty-tag">x${item.qty} ${item.unit || ""}</span>
+          </div>
+          <div class="item-subtotal">${formatMoney(item.price * item.qty)}</div>
+        </div>
+      `).join("");
+
+      return `
+        <div class="order-card">
+          <div class="order-card-header">
+            <div class="order-id-group">
+              <span class="order-id">📦 ${order.id}</span>
+              <span class="order-date">📅 ${formatDate(order.createdAt)}</span>
+            </div>
+            <div class="badges-group">
+              <span class="status-badge status-${order.orderStatus}">${statusLabel}</span>
+              <span class="payment-badge pay-${order.paymentStatus}">${paymentLabel}</span>
+            </div>
+          </div>
+          <div class="order-card-body">
+            <div class="order-items-wrap">
+              ${itemsHtml}
+            </div>
+            ${cancelNotice}
+          </div>
+          <div class="order-card-footer">
+            <div class="total-amount-box">
+              Tổng thanh toán: <strong>${formatMoney(order.total || order.subtotal)}</strong>
+            </div>
+            <div class="actions-group">
+              ${canCancel ? `<button class="btn-cancel" onclick="openCancelModal('${order.id}')">Yêu cầu huỷ</button>` : ""}
+              <a href="order-detail.html?id=${order.id}" class="btn-view">Xem chi tiết &rarr;</a>
+            </div>
+          </div>
+        </div>
+      `;
+    }).join("");
+  }
+
+  function openCancelModal(orderId) {
+    activeCancelOrderId = orderId;
+    document.getElementById("modalCancelOrderId").textContent = orderId;
+    document.getElementById("cancelReason").value = "";
+    document.getElementById("cancelModal").classList.remove("hidden");
+  }
+
+  function closeCancelModal() {
+    activeCancelOrderId = null;
+    document.getElementById("cancelModal").classList.add("hidden");
+  }
+
+  function handleCancelSubmit(e) {
+    e.preventDefault();
+    const reason = document.getElementById("cancelReason").value.trim();
+    if (!reason) {
+      showToastLocal("Vui lòng nhập lý do huỷ đơn hàng.", "error");
+      return;
+    }
+
+    const all = getAllOrders();
+    const order = all.find(o => o.id === activeCancelOrderId);
+    if (!order) {
+      showToastLocal("Không tìm thấy đơn hàng.", "error");
+      closeCancelModal();
+      return;
+    }
+
+    order.cancellationRequest = {
+      reason: reason,
+      status: "Pending",
+      requestedAt: new Date().toISOString()
+    };
+
+    if (!order.timeline) order.timeline = [];
+    order.timeline.push({
+      status: order.orderStatus,
+      time: new Date().toISOString(),
+      note: "Khách hàng gửi yêu cầu huỷ: " + reason
+    });
+
+    localStorage.setItem("ghp_orders", JSON.stringify(all));
+    closeCancelModal();
+    renderOrders();
+    showToastLocal("Yêu cầu huỷ đơn đã được gửi đi ✓", "success");
+  }
+
+  function showToastLocal(msg, type = "success") {
+    if (typeof showToast === "function") {
+      showToast(msg, type);
+      return;
+    }
+    const c = document.getElementById("toastContainer");
+    const t = document.createElement("div");
+    t.className = `toast ${type}`;
+    t.textContent = msg;
+    c.appendChild(t);
+    setTimeout(() => t.remove(), 3200);
+  }
+</script>
+</body>
+</html>

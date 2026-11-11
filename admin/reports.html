@@ -1,0 +1,772 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Báo cáo Doanh thu – GHP Admin</title>
+  <link rel="stylesheet" href="../styles/main.css">
+  <link rel="stylesheet" href="admin.css">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+    /* Reports specific layout & styling */
+    .disclaimer-box {
+      background: #FFF8F0;
+      border-left: 4px solid #D97745;
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      font-size: 13.5px;
+      color: #8B4513;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.03);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .demo-watermark-pill {
+      background: #FEE2E2;
+      color: #DC2626;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 12px;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    /* Date Filter Controls */
+    .report-filter-bar {
+      background: white;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+    .date-inputs-group {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+    .preset-btn-group {
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+    }
+    .preset-btn {
+      padding: 7px 12px;
+      background: #F8F5F0;
+      border: 1px solid #EDE5DB;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 600;
+      color: #666;
+      cursor: pointer;
+      font-family: 'Nunito', sans-serif;
+      transition: all 0.2s;
+    }
+    .preset-btn:hover {
+      background: #FFF8F0;
+      border-color: #D97745;
+      color: #D97745;
+    }
+    .preset-btn.active {
+      background: #D97745;
+      border-color: #D97745;
+      color: white;
+    }
+
+    /* Pure CSS Bar Chart */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+    @media (max-width: 1024px) {
+      .charts-grid { grid-template-columns: 1fr; }
+    }
+
+    .chart-card {
+      background: white;
+      border-radius: 12px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      display: flex;
+      flex-direction: column;
+    }
+    .chart-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #EDE5DB;
+    }
+    .chart-title {
+      font-size: 15px;
+      font-weight: 700;
+      color: #332A25;
+    }
+    .chart-sub {
+      font-size: 12px;
+      color: #888;
+    }
+
+    /* CSS Bar Chart Container */
+    .bar-chart-container {
+      height: 260px;
+      display: flex;
+      align-items: flex-end;
+      justify-content: space-around;
+      gap: 12px;
+      padding: 20px 10px 0;
+      border-bottom: 2px solid #EDE5DB;
+      position: relative;
+    }
+    .bar-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      height: 100%;
+      justify-content: flex-end;
+      flex: 1;
+      max-width: 58px;
+    }
+    .bar-val-label {
+      font-size: 11px;
+      font-weight: 700;
+      color: #D97745;
+      margin-bottom: 6px;
+      white-space: nowrap;
+    }
+    .bar-pillar {
+      width: 100%;
+      background: linear-gradient(180deg, #D97745 0%, #B85928 100%);
+      border-radius: 6px 6px 0 0;
+      transition: height 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+      box-shadow: 0 -2px 6px rgba(217, 119, 69, 0.25);
+    }
+    .bar-date-label {
+      font-size: 12px;
+      font-weight: 700;
+      color: #666;
+      margin-top: 8px;
+      text-align: center;
+    }
+
+    /* Pure CSS Donut Chart */
+    .donut-chart-box {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 0;
+      flex: 1;
+    }
+    .donut-visual {
+      width: 180px;
+      height: 180px;
+      border-radius: 50%;
+      background: conic-gradient(
+        #059669 0% 68.08%,
+        #0891B2 68.08% 85.1%,
+        #EF4444 85.1% 95.74%,
+        #F59E0B 95.74% 100%
+      );
+      position: relative;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+    .donut-hole {
+      position: absolute;
+      inset: 34px;
+      background: white;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: inset 0 2px 6px rgba(0,0,0,0.06);
+    }
+    .donut-hole-total {
+      font-size: 26px;
+      font-weight: 800;
+      color: #332A25;
+      line-height: 1;
+    }
+    .donut-hole-sub {
+      font-size: 11px;
+      color: #888;
+      text-transform: uppercase;
+      font-weight: 600;
+      margin-top: 4px;
+    }
+
+    .donut-legend {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+    .legend-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 12.5px;
+    }
+    .legend-label-wrap {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .legend-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+    }
+    .legend-dot.completed { background: #059669; }
+    .legend-dot.shipping { background: #0891B2; }
+    .legend-dot.cancelled { background: #EF4444; }
+    .legend-dot.pending { background: #F59E0B; }
+    .legend-count {
+      font-weight: 700;
+      color: #332A25;
+    }
+
+    /* Best Sellers */
+    .rank-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      font-weight: 800;
+      font-size: 12px;
+      background: #F8F5F0;
+      color: #666;
+    }
+    .rank-1 { background: #FEF3C7; color: #D97706; }
+    .rank-2 { background: #F3F4F6; color: #4B5563; }
+    .rank-3 { background: #FFEDD5; color: #C2410C; }
+
+    /* Export Box */
+    .export-box {
+      background: white;
+      border-radius: 12px;
+      padding: 16px 20px;
+      margin-top: 24px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 14px;
+    }
+    .export-note {
+      font-size: 13px;
+      color: #777;
+    }
+
+    /* 403 Forbidden */
+    .forbidden-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 50vh;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .forbidden-code { font-size: 64px; font-weight: 800; color: #DC2626; line-height: 1; }
+    .forbidden-title { font-size: 22px; font-weight: 700; margin: 12px 0 8px; color: #332A25; }
+    .forbidden-desc { color: #777; font-size: 14px; max-width: 440px; margin-bottom: 24px; }
+  </style>
+</head>
+<body>
+
+<div class="admin-layout">
+
+  <!-- Mobile Backdrop -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar" id="adminSidebar">
+    <div class="logo">
+      <div class="logo-brand">GHP OSBIS</div>
+      <div class="logo-sub">Back Office</div>
+    </div>
+
+    <div class="nav-section-title">Báo cáo & Phân tích</div>
+    <a href="reports.html" class="nav-item active">
+      <span class="nav-icon">📈</span>
+      <span>Báo cáo Doanh thu</span>
+    </a>
+
+    <div class="nav-section-title">Quản lý bán hàng</div>
+    <a href="orders.html" class="nav-item">
+      <span class="nav-icon">📦</span>
+      <span>Quản lý Đơn hàng</span>
+    </a>
+
+    <div class="sidebar-footer">
+      <a href="../index.html" class="nav-item" style="border-radius:8px;">
+        <span class="nav-icon">🏠</span>
+        <span>Về trang chủ</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Content Area -->
+  <div class="admin-content">
+
+    <!-- Topbar -->
+    <header class="admin-topbar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+        <nav class="admin-breadcrumb">
+          <a href="../index.html">GHP</a>
+          <span class="sep">›</span>
+          <a href="reports.html">Admin</a>
+          <span class="sep">›</span>
+          <span class="current">Báo cáo Doanh thu</span>
+        </nav>
+      </div>
+      <div class="admin-topbar-right">
+        <span class="role-badge manager" id="topRoleBadge">Quản lý</span>
+        <span class="admin-user-name" id="topUserName">Phạm Văn Đức</span>
+        <button class="btn-logout" onclick="doLogout()">Đăng xuất</button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+
+      <!-- 403 Forbidden Container -->
+      <div id="forbiddenContainer" class="forbidden-wrap" style="display:none;">
+        <div class="forbidden-code">403</div>
+        <div class="forbidden-title">Truy cập bị từ chối</div>
+        <p class="forbidden-desc">Bạn không có quyền truy cập trang Báo cáo Doanh thu. Chức năng này chỉ dành riêng cho vai trò Quản lý (Manager).</p>
+        <a href="../index.html" class="btn btn-primary">Về trang chủ</a>
+      </div>
+
+      <!-- Manager Content -->
+      <div id="managerContent">
+
+        <div style="margin-bottom:16px;">
+          <div class="page-title" style="margin-bottom:4px;">📈 Báo cáo Doanh thu</div>
+          <div class="page-subtitle">Tổng hợp chỉ số doanh thu kinh doanh & phân tích hành vi mua sắm</div>
+        </div>
+
+        <!-- Mandatory Disclaimer at top -->
+        <div class="disclaimer-box">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:22px;">📊</span>
+            <div>
+              <strong>Báo cáo tóm tắt vận hành – Dữ liệu demo minh họa. Doanh thu chỉ tính từ đơn Hoàn thành VÀ Đã thanh toán.</strong>
+              <div style="font-size:12px;color:#8B4513;margin-top:2px;">
+                Dữ liệu demo – Không phản ánh giao dịch thực tế. Các đơn hàng chưa thanh toán hoặc bị hủy không được ghi nhận vào doanh số.
+              </div>
+            </div>
+          </div>
+          <span class="demo-watermark-pill">Demo Only</span>
+        </div>
+
+        <!-- Date Range Filter Bar -->
+        <div class="report-filter-bar">
+          <div class="date-inputs-group">
+            <span style="font-size:13px;font-weight:700;color:#666;">Từ ngày:</span>
+            <input type="date" id="reportDateFrom" class="filter-input" style="min-width:140px;" />
+            <span style="font-size:13px;font-weight:700;color:#666;">Đến ngày:</span>
+            <input type="date" id="reportDateTo" class="filter-input" style="min-width:140px;" />
+            <button class="btn btn-primary" onclick="applyDateFilter()">Áp dụng</button>
+          </div>
+          <div class="preset-btn-group">
+            <button class="preset-btn" onclick="selectPreset('today', this)">Hôm nay</button>
+            <button class="preset-btn active" onclick="selectPreset('7days', this)">7 ngày qua</button>
+            <button class="preset-btn" onclick="selectPreset('30days', this)">30 ngày qua</button>
+            <button class="preset-btn" onclick="selectPreset('thisMonth', this)">Tháng này</button>
+          </div>
+        </div>
+
+        <!-- Empty State Container (shown when date filter has no data) -->
+        <div id="emptyReportState" class="admin-card" style="display:none;text-align:center;padding:60px 20px;">
+          <div style="font-size:48px;margin-bottom:14px;">📭</div>
+          <div style="font-size:18px;font-weight:800;color:#332A25;margin-bottom:6px;">Không có dữ liệu trong khoảng thời gian này</div>
+          <p style="color:#888;font-size:14px;max-width:400px;margin:0 auto 20px;">Vui lòng chọn khoảng thời gian khác hoặc sử dụng các nút chọn nhanh để xem báo cáo doanh thu.</p>
+          <button class="btn btn-primary" onclick="selectPreset('7days')">Xem 7 ngày qua</button>
+        </div>
+
+        <!-- Data Content Area -->
+        <div id="dataReportArea">
+
+          <!-- KPI Summary Cards (4 cards) -->
+          <div class="kpi-grid">
+            <div class="kpi-card orange">
+              <div class="kpi-label">💰 Doanh thu (Completed + Paid)</div>
+              <div class="kpi-value" id="kpiRevenue" style="color:#D97745;">15.750.000 ₫</div>
+              <div class="kpi-sub">Chỉ tính đơn đã hoàn tất & TT</div>
+            </div>
+            <div class="kpi-card blue">
+              <div class="kpi-label">📋 Tổng đơn hàng</div>
+              <div class="kpi-value" id="kpiTotalOrders">47</div>
+              <div class="kpi-sub">Tất cả trạng thái phát sinh</div>
+            </div>
+            <div class="kpi-card green">
+              <div class="kpi-label">✅ Đơn hoàn thành</div>
+              <div class="kpi-value" id="kpiCompletedOrders" style="color:#059669;">32</div>
+              <div class="kpi-sub">Tỷ lệ thành công: 68.1%</div>
+            </div>
+            <div class="kpi-card purple">
+              <div class="kpi-label">📦 Sản phẩm bán chạy</div>
+              <div class="kpi-value" id="kpiTopProduct" style="font-size:17px;line-height:1.3;padding-top:4px;">Bột mì Meizan 1kg</div>
+              <div class="kpi-sub">125 túi đã xuất kho</div>
+            </div>
+          </div>
+
+          <!-- Pure CSS Charts Section -->
+          <div class="charts-grid">
+
+            <!-- Chart 1: Bar Chart -->
+            <div class="chart-card">
+              <div class="chart-header">
+                <div>
+                  <div class="chart-title">📊 Doanh thu 7 ngày gần nhất (Đơn Hoàn thành & Đã TT)</div>
+                  <div class="chart-sub">Biểu đồ thanh mô phỏng diễn biến doanh số thuần theo ngày</div>
+                </div>
+                <span class="role-badge" style="background:#FFF8F0;color:#D97745;">VND Pure CSS</span>
+              </div>
+
+              <!-- Bar Chart Elements -->
+              <div class="bar-chart-container" id="barChartContainer">
+                <!-- Rendered dynamically via JS using pure HTML/CSS -->
+              </div>
+            </div>
+
+            <!-- Chart 2: Donut Chart -->
+            <div class="chart-card">
+              <div class="chart-header">
+                <div>
+                  <div class="chart-title">🍩 Tỷ lệ Trạng thái Đơn hàng</div>
+                  <div class="chart-sub">Cơ cấu 47 đơn hàng theo phân bổ</div>
+                </div>
+              </div>
+
+              <div class="donut-chart-box">
+                <!-- CSS Conic Gradient Donut -->
+                <div class="donut-visual">
+                  <div class="donut-hole">
+                    <div class="donut-hole-total">47</div>
+                    <div class="donut-hole-sub">Đơn hàng</div>
+                  </div>
+                </div>
+
+                <!-- Legend -->
+                <div class="donut-legend">
+                  <div class="legend-item">
+                    <div class="legend-label-wrap">
+                      <div class="legend-dot completed"></div>
+                      <span>Hoàn thành (Completed)</span>
+                    </div>
+                    <div class="legend-count">32 (68%)</div>
+                  </div>
+                  <div class="legend-item">
+                    <div class="legend-label-wrap">
+                      <div class="legend-dot shipping"></div>
+                      <span>Đang giao (Shipping)</span>
+                    </div>
+                    <div class="legend-count">8 (17%)</div>
+                  </div>
+                  <div class="legend-item">
+                    <div class="legend-label-wrap">
+                      <div class="legend-dot cancelled"></div>
+                      <span>Đã huỷ (Cancelled)</span>
+                    </div>
+                    <div class="legend-count">5 (11%)</div>
+                  </div>
+                  <div class="legend-item">
+                    <div class="legend-label-wrap">
+                      <div class="legend-dot pending"></div>
+                      <span>Chờ xử lý (Pending)</span>
+                    </div>
+                    <div class="legend-count">2 (4%)</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- Best-selling Products Table -->
+          <div class="admin-card">
+            <div class="admin-card-header">
+              <div>
+                <span class="admin-card-title">🏆 Top 5 Sản phẩm Bán chạy nhất</span>
+                <div style="font-size:12px;color:#888;margin-top:2px;">Thống kê tổng hợp số lượng & doanh thu từ các đơn hàng thành công</div>
+              </div>
+              <span style="font-size:12px;color:#059669;font-weight:700;">Dữ liệu đơn Completed + Paid</span>
+            </div>
+
+            <div class="table-wrapper">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th style="width:48px;">#</th>
+                    <th>Tên sản phẩm</th>
+                    <th>Danh mục</th>
+                    <th style="text-align:right;">Số lượng bán</th>
+                    <th style="text-align:right;">Doanh thu</th>
+                  </tr>
+                </thead>
+                <tbody id="topProductsTableBody">
+                  <tr>
+                    <td><span class="rank-badge rank-1">1</span></td>
+                    <td><strong>Bột mì đa dụng Meizan 1kg</strong></td>
+                    <td><span class="role-badge" style="background:#FFF8F0;color:#D97745;">Bột làm bánh</span></td>
+                    <td style="text-align:right;font-weight:700;">125 túi</td>
+                    <td style="text-align:right;font-weight:800;color:#D97745;">3.125.000 ₫</td>
+                  </tr>
+                  <tr>
+                    <td><span class="rank-badge rank-2">2</span></td>
+                    <td><strong>Đường cát trắng Biên Hòa 1kg</strong></td>
+                    <td><span class="role-badge" style="background:#F3F4F6;color:#4B5563;">Đường</span></td>
+                    <td style="text-align:right;font-weight:700;">98 túi</td>
+                    <td style="text-align:right;font-weight:800;color:#D97745;">2.156.000 ₫</td>
+                  </tr>
+                  <tr>
+                    <td><span class="rank-badge rank-3">3</span></td>
+                    <td><strong>Bơ nhạt Anchor 200g</strong></td>
+                    <td><span class="role-badge" style="background:#FEF3C7;color:#B45309;">Bơ & Sữa</span></td>
+                    <td style="text-align:right;font-weight:700;">67 hộp</td>
+                    <td style="text-align:right;font-weight:800;color:#D97745;">3.015.000 ₫</td>
+                  </tr>
+                  <tr>
+                    <td><span class="rank-badge">4</span></td>
+                    <td><strong>Bột nở Double Acting 100g</strong></td>
+                    <td><span class="role-badge" style="background:#FFF8F0;color:#D97745;">Bột làm bánh</span></td>
+                    <td style="text-align:right;font-weight:700;">54 hộp</td>
+                    <td style="text-align:right;font-weight:800;color:#D97745;">972.000 ₫</td>
+                  </tr>
+                  <tr>
+                    <td><span class="rank-badge">5</span></td>
+                    <td><strong>Màu thực phẩm gel (bộ 12 màu)</strong></td>
+                    <td><span class="role-badge" style="background:#EDE9FE;color:#7C3AED;">Trang trí</span></td>
+                    <td style="text-align:right;font-weight:700;">42 bộ</td>
+                    <td style="text-align:right;font-weight:800;color:#D97745;">3.990.000 ₫</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+
+          <!-- Export Controls -->
+          <div class="export-box">
+            <div class="export-note">
+              <span>ℹ️ <strong>Lưu ý:</strong> Chức năng xuất file chỉ có trong hệ thống thực kết nối cơ sở dữ liệu.</span>
+            </div>
+            <div style="display:flex;gap:10px;">
+              <button class="btn btn-secondary" onclick="exportData('CSV')">📄 Xuất CSV (Demo)</button>
+              <button class="btn btn-secondary" onclick="exportData('PDF')">📑 Xuất PDF (Demo)</button>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="../scripts/main.js"></script>
+<script>
+// ==================== 7-DAY REVENUE DATA ====================
+const REVENUE_DATA = [
+  { date: "05/11", value: 1250000 },
+  { date: "06/11", value: 980000 },
+  { date: "07/11", value: 1850000 },
+  { date: "08/11", value: 720000 },
+  { date: "09/11", value: 2100000 },
+  { date: "10/11", value: 1680000 },
+  { date: "11/11", value: 1170000 }
+];
+
+let currentUser = null;
+
+// ==================== AUTH CHECK (ROLE: MANAGER ONLY) ====================
+function checkAuth() {
+  const session = sessionStorage.getItem('ghp_user');
+  let u = null;
+  if (session) {
+    try { u = JSON.parse(session); } catch(e){}
+  }
+
+  // If no user is logged in, default to Manager for testing preview
+  if (!u) {
+    u = { id: 4, name: "Phạm Văn Đức", email: "duc.manager@ghp.vn", role: "manager" };
+    sessionStorage.setItem('ghp_user', JSON.stringify(u));
+  }
+  currentUser = u;
+
+  document.getElementById('topUserName').textContent = u.name || 'Quản lý';
+  const roleBadge = document.getElementById('topRoleBadge');
+  roleBadge.className = 'role-badge ' + (u.role || 'manager');
+  const roleTitles = { manager: 'Quản lý', administrator: 'Quản trị viên', sales_staff: 'Sales', inventory_staff: 'Kho' };
+  roleBadge.textContent = roleTitles[u.role] || u.role;
+
+  // Strict check: role manager only. Others see 403 message.
+  if (u.role !== 'manager') {
+    document.getElementById('managerContent').style.display = 'none';
+    document.getElementById('forbiddenContainer').style.display = 'flex';
+    return false;
+  }
+
+  document.getElementById('managerContent').style.display = 'block';
+  document.getElementById('forbiddenContainer').style.display = 'none';
+  return true;
+}
+
+function doLogout() {
+  sessionStorage.removeItem('ghp_user');
+  window.location.href = '../login.html';
+}
+
+function toggleSidebar() {
+  document.getElementById('adminSidebar').classList.toggle('open');
+  document.getElementById('sidebarBackdrop').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('adminSidebar').classList.remove('open');
+  document.getElementById('sidebarBackdrop').classList.remove('open');
+}
+
+// ==================== PURE CSS BAR CHART ====================
+function formatCompactVND(n) {
+  if (n >= 1000000) {
+    return (n / 1000000).toFixed(2).replace(/\.00$/, '') + 'M';
+  }
+  return (n / 1000) + 'k';
+}
+
+function formatFullVND(n) {
+  return Number(n).toLocaleString('vi-VN') + ' ₫';
+}
+
+function renderBarChart(data) {
+  const container = document.getElementById('barChartContainer');
+  if (!data || data.length === 0) {
+    container.innerHTML = '<div style="margin:auto;color:#888;">Không có dữ liệu biểu đồ</div>';
+    return;
+  }
+
+  const maxVal = Math.max(...data.map(d => d.value));
+
+  container.innerHTML = data.map(item => {
+    const heightPercent = Math.round((item.value / maxVal) * 82); // Max height 82% to give space for labels
+    return `
+      <div class="bar-col">
+        <span class="bar-val-label" title="${formatFullVND(item.value)}">${formatCompactVND(item.value)}</span>
+        <div class="bar-pillar" style="height: ${heightPercent}%;" title="${item.date}: ${formatFullVND(item.value)}"></div>
+        <span class="bar-date-label">${item.date}</span>
+      </div>
+    `;
+  }).join('');
+}
+
+// ==================== DATE PRESETS & FILTERS ====================
+function setDateInputs(fromStr, toStr) {
+  document.getElementById('reportDateFrom').value = fromStr;
+  document.getElementById('reportDateTo').value = toStr;
+}
+
+function selectPreset(preset, btnElement) {
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  if (btnElement) btnElement.classList.add('active');
+
+  const now = new Date();
+  const pad = n => String(n).padStart(2, '0');
+  const fmt = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+
+  const todayStr = fmt(now);
+
+  if (preset === 'today') {
+    setDateInputs(todayStr, todayStr);
+    applyFilterLogic(todayStr, todayStr);
+  } else if (preset === '7days') {
+    const d7 = new Date();
+    d7.setDate(now.getDate() - 6);
+    setDateInputs(fmt(d7), todayStr);
+    applyFilterLogic(fmt(d7), todayStr);
+  } else if (preset === '30days') {
+    const d30 = new Date();
+    d30.setDate(now.getDate() - 29);
+    setDateInputs(fmt(d30), todayStr);
+    applyFilterLogic(fmt(d30), todayStr);
+  } else if (preset === 'thisMonth') {
+    const dMonth = new Date(now.getFullYear(), now.getMonth(), 1);
+    setDateInputs(fmt(dMonth), todayStr);
+    applyFilterLogic(fmt(dMonth), todayStr);
+  }
+}
+
+function applyDateFilter() {
+  const from = document.getElementById('reportDateFrom').value;
+  const to = document.getElementById('reportDateTo').value;
+  document.querySelectorAll('.preset-btn').forEach(b => b.classList.remove('active'));
+  applyFilterLogic(from, to);
+}
+
+function applyFilterLogic(from, to) {
+  // If user selected an empty range or future range beyond 2026-11-20
+  if (from && to && from > to) {
+    showToast('Ngày bắt đầu không được lớn hơn ngày kết thúc!', 'error');
+    return;
+  }
+
+  // Simulate empty state if date range is far in future or past where no demo exists
+  if (from && from > '2025-01-01') {
+    document.getElementById('dataReportArea').style.display = 'none';
+    document.getElementById('emptyReportState').style.display = 'block';
+  } else {
+    document.getElementById('dataReportArea').style.display = 'block';
+    document.getElementById('emptyReportState').style.display = 'none';
+    renderBarChart(REVENUE_DATA);
+  }
+}
+
+// ==================== EXPORT BUTTONS ====================
+function exportData(type) {
+  showToast('Chức năng xuất file sẽ được triển khai trong hệ thống thực.', 'warning');
+}
+
+// ==================== TOAST ====================
+function showToast(msg, type = 'success') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  const icon = type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ';
+  t.innerHTML = `<span>${icon}</span> ${msg}`;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+// ==================== INIT ====================
+(function init() {
+  if (!checkAuth()) return;
+  selectPreset('7days');
+})();
+</script>
+</body>
+</html>

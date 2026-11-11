@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Chi tiết sản phẩm – Gia Hoa Phat</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/main.css" />
+  <style>
+    /* ── Product Detail Page Styles ── */
+    .product-detail-wrap { max-width: 1200px; margin: 0 auto; padding: 24px 16px; }
+
+    /* Gallery */
+    .product-gallery { flex: 0 0 58%; }
+    .main-image-box {
+      width: 100%; height: 400px; border-radius: 16px;
+      display: flex; align-items: center; justify-content: center;
+      position: relative; overflow: hidden; cursor: pointer;
+      border: 2px solid var(--border-color, #EDE5DB);
+      transition: box-shadow 0.3s;
+    }
+    .main-image-box:hover { box-shadow: 0 8px 32px rgba(0,0,0,0.12); }
+    .gallery-watermark {
+      position: absolute; bottom: 12px; right: 12px;
+      background: rgba(0,0,0,0.35); color: #fff;
+      font-size: 11px; padding: 4px 10px; border-radius: 6px;
+      pointer-events: none;
+    }
+    .main-image-emoji { font-size: 100px; opacity: 0.5; }
+    .thumb-row { display: flex; gap: 10px; margin-top: 12px; }
+    .thumb-box {
+      width: 80px; height: 70px; border-radius: 10px;
+      border: 2px solid transparent; cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 32px; transition: border-color 0.2s, transform 0.2s;
+      flex-shrink: 0;
+    }
+    .thumb-box:hover { transform: scale(1.06); }
+    .thumb-box.active { border-color: #D97745; }
+
+    /* Info Column */
+    .product-info-col { flex: 1; min-width: 0; }
+    .product-info-col h1 {
+      font-family: 'Playfair Display', serif; font-size: 1.75rem;
+      color: #332A25; margin: 0 0 10px; line-height: 1.3;
+    }
+    .product-meta-pills { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+    .pill {
+      display: inline-flex; align-items: center; gap: 4px;
+      padding: 4px 12px; border-radius: 999px; font-size: 12px; font-weight: 600;
+    }
+    .pill-cat { background: #FFF8F0; color: #D97745; border: 1px solid #D97745; }
+    .pill-brand { background: #F0F5EF; color: #789B75; border: 1px solid #789B75; }
+    .pill-origin { background: #F5F0EB; color: #7a6252; border: 1px solid #c9b8a4; }
+
+    .product-price-block { margin: 14px 0; }
+    .product-price {
+      font-size: 2.2rem; font-weight: 800; color: #D97745;
+      font-family: 'Nunito', sans-serif;
+    }
+    .product-unit { font-size: 13px; color: #888; margin-top: 2px; }
+
+    .stock-badge {
+      display: inline-flex; align-items: center; gap: 6px;
+      padding: 5px 14px; border-radius: 999px; font-size: 13px; font-weight: 600;
+      margin: 10px 0;
+    }
+    .stock-badge.in-stock { background: #E8F5E9; color: #2e7d32; }
+    .stock-badge.out-stock { background: #FFEBEE; color: #c62828; }
+    .stock-dot { font-size: 10px; }
+
+    /* Collapsible sections */
+    .collapsible-section { border: 1px solid #EDE5DB; border-radius: 12px; margin: 14px 0; overflow: hidden; }
+    .collapsible-header {
+      width: 100%; background: #FFF8F0; border: none; cursor: pointer;
+      padding: 13px 16px; display: flex; align-items: center; justify-content: space-between;
+      font-weight: 700; font-size: 14px; color: #332A25; font-family: 'Nunito', sans-serif;
+    }
+    .collapsible-header:hover { background: #FAEEE4; }
+    .collapsible-arrow { transition: transform 0.3s; font-size: 12px; }
+    .collapsible-header.open .collapsible-arrow { transform: rotate(180deg); }
+    .collapsible-body { padding: 14px 16px; font-size: 13.5px; color: #555; line-height: 1.7; display: none; }
+    .collapsible-body.open { display: block; }
+    .collapsible-body p { margin: 4px 0; }
+    .info-row { display: flex; gap: 6px; margin: 4px 0; }
+    .info-label { font-weight: 700; color: #332A25; min-width: 110px; }
+
+    /* Quantity stepper */
+    .qty-block { display: flex; align-items: center; gap: 12px; margin: 16px 0; }
+    .qty-label { font-weight: 700; font-size: 14px; color: #332A25; }
+    .qty-stepper { display: flex; align-items: center; gap: 0; border: 2px solid #EDE5DB; border-radius: 10px; overflow: hidden; }
+    .qty-btn {
+      background: #FFF8F0; border: none; padding: 8px 14px; cursor: pointer;
+      font-size: 18px; font-weight: 700; color: #D97745; transition: background 0.2s;
+      line-height: 1;
+    }
+    .qty-btn:hover:not(:disabled) { background: #FAEEE4; }
+    .qty-btn:disabled { color: #ccc; cursor: not-allowed; }
+    .qty-input {
+      width: 50px; border: none; text-align: center; font-size: 15px; font-weight: 700;
+      color: #332A25; background: #fff; outline: none; font-family: 'Nunito', sans-serif;
+      padding: 8px 0;
+    }
+    .qty-input::-webkit-inner-spin-button,
+    .qty-input::-webkit-outer-spin-button { -webkit-appearance: none; }
+
+    /* Add to cart button */
+    .btn-add-cart {
+      width: 100%; padding: 15px; font-size: 16px; font-weight: 800;
+      background: #D97745; color: #fff; border: none; border-radius: 12px;
+      cursor: pointer; font-family: 'Nunito', sans-serif;
+      transition: background 0.2s, transform 0.15s, box-shadow 0.2s;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+    }
+    .btn-add-cart:hover:not(:disabled) {
+      background: #c46535; transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(217,119,69,0.35);
+    }
+    .btn-add-cart:disabled { background: #ccc; cursor: not-allowed; transform: none; box-shadow: none; }
+
+    .product-note {
+      font-size: 12px; color: #999; margin-top: 12px;
+      padding: 10px 14px; background: #FFFBF5; border-radius: 8px;
+      border-left: 3px solid #D97745; line-height: 1.6;
+    }
+
+    /* Two-column layout */
+    .product-layout { display: flex; gap: 40px; align-items: flex-start; }
+    @media (max-width: 768px) {
+      .product-layout { flex-direction: column; gap: 24px; }
+      .product-gallery { flex: none; width: 100%; }
+      .main-image-box { height: 260px; }
+      .product-info-col h1 { font-size: 1.3rem; }
+      .product-price { font-size: 1.7rem; }
+    }
+
+    /* Related products */
+    .related-section { margin-top: 48px; }
+    .related-section h2 { font-family: 'Playfair Display', serif; font-size: 1.5rem; color: #332A25; margin-bottom: 20px; }
+    .related-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+    @media (max-width: 992px) { .related-grid { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 576px) { .related-grid { grid-template-columns: 1fr 1fr; gap: 12px; } }
+
+    /* Not found */
+    .not-found-box {
+      text-align: center; padding: 80px 24px; max-width: 500px; margin: 0 auto;
+    }
+    .not-found-box .nf-icon { font-size: 72px; margin-bottom: 16px; }
+    .not-found-box h2 { font-family: 'Playfair Display', serif; color: #332A25; }
+    .not-found-box p { color: #888; margin: 10px 0 24px; }
+
+    /* Login modal */
+    .modal-overlay {
+      position: fixed; inset: 0; background: rgba(0,0,0,0.45);
+      display: flex; align-items: center; justify-content: center;
+      z-index: 9000; opacity: 0; pointer-events: none; transition: opacity 0.25s;
+    }
+    .modal-overlay.show { opacity: 1; pointer-events: all; }
+    .modal-box {
+      background: #fff; border-radius: 20px; padding: 36px 32px;
+      max-width: 420px; width: 90%; text-align: center;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.18);
+      transform: scale(0.9); transition: transform 0.25s;
+    }
+    .modal-overlay.show .modal-box { transform: scale(1); }
+    .modal-box h3 { font-family: 'Playfair Display', serif; font-size: 1.3rem; margin: 12px 0 8px; color: #332A25; }
+    .modal-box p { color: #888; font-size: 14px; margin-bottom: 24px; }
+    .modal-icon { font-size: 48px; }
+    .modal-actions { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+    .modal-actions a {
+      display: inline-block; padding: 11px 28px; border-radius: 10px; font-weight: 700;
+      font-size: 14px; text-decoration: none; transition: all 0.2s;
+    }
+    .modal-btn-primary { background: #D97745; color: #fff; }
+    .modal-btn-primary:hover { background: #c46535; }
+    .modal-btn-secondary { background: #FFF8F0; color: #D97745; border: 2px solid #D97745; }
+    .modal-btn-secondary:hover { background: #FAEEE4; }
+    .modal-close-btn {
+      position: absolute; top: 16px; right: 20px; background: none; border: none;
+      font-size: 22px; cursor: pointer; color: #aaa;
+    }
+    .modal-close-btn:hover { color: #555; }
+
+    /* Breadcrumb */
+    .breadcrumb { display: flex; align-items: center; gap: 8px; padding: 14px 0; flex-wrap: wrap; }
+    .breadcrumb a { color: #D97745; text-decoration: none; font-size: 13px; font-weight: 600; }
+    .breadcrumb a:hover { text-decoration: underline; }
+    .breadcrumb span { color: #bbb; font-size: 13px; }
+    .breadcrumb .bc-current { color: #332A25; font-size: 13px; font-weight: 700; }
+  </style>
+</head>
+<body>
+
+<!-- ══ HEADER (shared) ══ -->
+<div id="site-header"></div>
+
+<!-- ══ LOGIN MODAL ══ -->
+<div class="modal-overlay" id="login-modal">
+  <div class="modal-box" style="position:relative;">
+    <button class="modal-close-btn" onclick="closeLoginModal()">✕</button>
+    <div class="modal-icon">🔐</div>
+    <h3>Vui lòng đăng nhập</h3>
+    <p>Bạn cần đăng nhập để thêm sản phẩm vào giỏ hàng và mua hàng.</p>
+    <div class="modal-actions">
+      <a href="login.html" class="modal-btn-primary">Đăng nhập</a>
+      <a href="register.html" class="modal-btn-secondary">Đăng ký</a>
+    </div>
+  </div>
+</div>
+
+<!-- ══ TOAST ══ -->
+<div id="toast-container" style="position:fixed;top:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:10px;"></div>
+
+<main>
+  <div class="product-detail-wrap">
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb" id="breadcrumb-nav" aria-label="Breadcrumb">
+      <a href="index.html">🏠 Trang chủ</a>
+      <span>›</span>
+      <span id="bc-cat"><a href="catalog.html">Danh mục</a></span>
+      <span>›</span>
+      <span class="bc-current" id="bc-name">Sản phẩm</span>
+    </nav>
+
+    <!-- Dynamic content -->
+    <div id="product-content"></div>
+
+  </div>
+</main>
+
+<footer id="site-footer" style="margin-top:60px;background:#332A25;color:#ccc;text-align:center;padding:24px 16px;font-size:13px;">
+  © 2024 Gia Hoa Phat. Website demo – không phải cửa hàng thực tế.
+</footer>
+
+<script src="scripts/main.js" defer></script>
+<script>
+/* ══ PRODUCT DETAIL PAGE LOGIC ══ */
+
+// Ingredient categories
+const INGREDIENT_CATS = ['bot','duong','bo-sua','chocolate','trang-tri'];
+const EQUIPMENT_CATS  = ['dung-cu','thiet-bi'];
+
+// Nutritional / ingredient info per category (demo)
+const CAT_INGREDIENT_INFO = {
+  'bot': {
+    description: 'Bột mì đa dụng được xay từ lúa mì chất lượng cao, phù hợp làm bánh mì, bánh ngọt, bánh bao.',
+    allergen: 'Chứa gluten (lúa mì)',
+    storage: 'Nơi khô ráo, thoáng mát, tránh ánh nắng trực tiếp',
+    shelf: '12 tháng kể từ ngày sản xuất'
+  },
+  'duong': {
+    description: 'Đường tinh luyện từ mía, trắng tinh, tan đều, dùng làm bánh, kẹo và đồ uống.',
+    allergen: 'Không chứa các chất gây dị ứng thông thường',
+    storage: 'Đậy kín, để nơi khô thoáng, tránh ẩm',
+    shelf: '24 tháng kể từ ngày sản xuất'
+  },
+  'bo-sua': {
+    description: 'Bơ, bơ sữa, whipping cream và sản phẩm từ sữa chất lượng cao cho nghề làm bánh.',
+    allergen: 'Chứa sữa và các sản phẩm từ sữa',
+    storage: 'Bảo quản lạnh 2–8°C, không để đông đá (trừ khi có hướng dẫn riêng)',
+    shelf: 'Xem ngày hết hạn trên bao bì'
+  },
+  'chocolate': {
+    description: 'Chocolate làm bánh cao cấp với hàm lượng cacao đậm đà, tan chảy mịn màng.',
+    allergen: 'Chứa sữa, đậu nành, có thể chứa hạt cây. Nhà máy cũng sản xuất sản phẩm chứa gluten.',
+    storage: 'Bảo quản ở 15–18°C, tránh ẩm và mùi lạ',
+    shelf: '18 tháng kể từ ngày sản xuất'
+  },
+  'trang-tri': {
+    description: 'Các nguyên liệu trang trí bánh đa dạng: hạt rắc, fondant, màu thực phẩm, hoa đường.',
+    allergen: 'Có thể chứa màu thực phẩm tổng hợp. Xem nhãn sản phẩm cụ thể.',
+    storage: 'Nơi mát, thoáng khí, tránh nhiệt độ cao và ánh nắng',
+    shelf: 'Xem ngày hết hạn trên bao bì'
+  }
+};
+
+const CAT_EQUIPMENT_INFO = {
+  'dung-cu': {
+    usage: 'Làm sạch trước khi sử dụng. Dùng đúng mục đích, không dùng cho thực phẩm nóng quá giới hạn chịu nhiệt. Rửa tay khô sau khi rửa.',
+  },
+  'thiet-bi': {
+    usage: 'Đọc kỹ hướng dẫn sử dụng đi kèm. Không nhúng thiết bị điện vào nước. Tắt nguồn khi không sử dụng.',
+  }
+};
+
+function formatVND(n) {
+  return n.toLocaleString('vi-VN') + ' ₫';
+}
+
+function getProductById(id) {
+  if (typeof PRODUCTS === 'undefined') return null;
+  return PRODUCTS.find(p => p.id === parseInt(id)) || null;
+}
+
+function closeLoginModal() {
+  document.getElementById('login-modal').classList.remove('show');
+}
+
+function showToastLocal(msg, type = 'success') {
+  if (typeof showToast === 'function') { showToast(msg, type); return; }
+  const c = document.getElementById('toast-container');
+  const t = document.createElement('div');
+  t.style.cssText = `background:${type==='success'?'#2e7d32':'#c62828'};color:#fff;padding:12px 20px;border-radius:10px;font-size:14px;font-weight:600;box-shadow:0 4px 16px rgba(0,0,0,0.2);`;
+  t.textContent = msg;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+
+function handleAddToCart(product, qty) {
+  const loggedIn = typeof isLoggedIn === 'function' ? isLoggedIn() : !!sessionStorage.getItem('ghp_user');
+  if (!loggedIn) {
+    document.getElementById('login-modal').classList.add('show');
+    return;
+  }
+  if (typeof addToCart === 'function') {
+    addToCart(product, qty);
+    showToastLocal('Đã thêm vào giỏ hàng! 🛒');
+  } else {
+    // Fallback cart logic
+    let cart = JSON.parse(localStorage.getItem('ghp_cart') || '[]');
+    const idx = cart.findIndex(i => i.id === product.id);
+    if (idx > -1) cart[idx].qty += qty;
+    else cart.push({ id: product.id, name: product.name, price: product.price, unit: product.unit, color: product.color, qty, stock: product.stock });
+    localStorage.setItem('ghp_cart', JSON.stringify(cart));
+    showToastLocal('Đã thêm vào giỏ hàng! 🛒');
+    updateCartCount && updateCartCount();
+  }
+}
+
+function buildCollapsible(id, title, bodyHtml) {
+  return `
+    <div class="collapsible-section">
+      <button class="collapsible-header" id="ch-${id}" onclick="toggleCollapsible('${id}')">
+        <span>${title}</span>
+        <span class="collapsible-arrow" id="ca-${id}">▼</span>
+      </button>
+      <div class="collapsible-body" id="cb-${id}">${bodyHtml}</div>
+    </div>`;
+}
+
+function toggleCollapsible(id) {
+  const header = document.getElementById('ch-' + id);
+  const body   = document.getElementById('cb-' + id);
+  const arrow  = document.getElementById('ca-' + id);
+  const isOpen = body.classList.toggle('open');
+  header.classList.toggle('open', isOpen);
+}
+
+function buildGallery(product) {
+  const shades = [product.color || '#F5E6C8',
+    lightenColor(product.color || '#F5E6C8', 20),
+    darkenColor(product.color  || '#F5E6C8', 15)];
+  const emoji = product.emoji || '🛒';
+  return `
+    <div class="product-gallery">
+      <div class="main-image-box" id="main-img" style="background:${shades[0]};">
+        <span class="main-image-emoji">${emoji}</span>
+        <span class="gallery-watermark">🖼 Hình ảnh minh họa (Demo)</span>
+      </div>
+      <div class="thumb-row">
+        ${shades.map((c,i) => `
+          <div class="thumb-box ${i===0?'active':''}" id="thumb-${i}"
+               onclick="selectThumb(${i}, '${c}', '${emoji}')"
+               style="background:${c};">
+            <span style="font-size:24px;">${emoji}</span>
+          </div>`).join('')}
+        <div class="thumb-box" onclick="selectThumb(3, '#fff', '📦')"
+             style="background:#f9f9f9; border:2px dashed #ddd;">
+          <span style="font-size:24px;">📦</span>
+        </div>
+      </div>
+    </div>`;
+}
+
+function selectThumb(idx, color, emoji) {
+  document.getElementById('main-img').style.background = color;
+  document.getElementById('main-img').querySelector('.main-image-emoji').textContent = emoji;
+  document.querySelectorAll('.thumb-box').forEach((t,i) => t.classList.toggle('active', i===idx));
+}
+
+function lightenColor(hex, pct) {
+  const n = parseInt(hex.replace('#',''), 16);
+  const r = Math.min(255, (n>>16) + Math.round(pct*2.55));
+  const g = Math.min(255, ((n>>8)&0xff) + Math.round(pct*2.55));
+  const b = Math.min(255, (n&0xff) + Math.round(pct*2.55));
+  return `rgb(${r},${g},${b})`;
+}
+function darkenColor(hex, pct) {
+  const n = parseInt(hex.replace('#',''), 16);
+  const r = Math.max(0, (n>>16) - Math.round(pct*2.55));
+  const g = Math.max(0, ((n>>8)&0xff) - Math.round(pct*2.55));
+  const b = Math.max(0, (n&0xff) - Math.round(pct*2.55));
+  return `rgb(${r},${g},${b})`;
+}
+
+function buildProductInfo(product) {
+  const inStock = product.stock > 0;
+  const catInfo = CAT_INGREDIENT_INFO[product.category];
+  const eqInfo  = CAT_EQUIPMENT_INFO[product.category];
+  const isIngredient = INGREDIENT_CATS.includes(product.category);
+  const isEquipment  = EQUIPMENT_CATS.includes(product.category);
+
+  let collapsibles = '';
+
+  if (isIngredient && catInfo) {
+    const bodyHtml = `
+      <p><strong>Mô tả:</strong> ${product.description || catInfo.description}</p>
+      <div style="margin-top:10px;">
+        <div class="info-row"><span class="info-label">⚠️ Dị ứng:</span><span>${catInfo.allergen}</span></div>
+        <div class="info-row"><span class="info-label">🌡 Bảo quản:</span><span>${catInfo.storage}</span></div>
+        <div class="info-row"><span class="info-label">📅 Hạn sử dụng:</span><span>${catInfo.shelf}</span></div>
+      </div>`;
+    collapsibles += buildCollapsible('nutrition', '🧪 Thành phần & Thông tin dinh dưỡng', bodyHtml);
+  }
+
+  if (isEquipment && eqInfo) {
+    const usageBody = `<p>${eqInfo.usage}</p>`;
+    collapsibles += buildCollapsible('usage', '📖 Hướng dẫn sử dụng & An toàn', usageBody);
+    if (product.warranty) {
+      collapsibles += buildCollapsible('warranty', '🛡 Bảo hành', `<p>${product.warranty}</p>`);
+    }
+  }
+
+  // Qty stepper max
+  const maxQty = inStock ? product.stock : 0;
+
+  return `
+    <div class="product-info-col">
+      <h1>${product.name}</h1>
+
+      <div class="product-meta-pills">
+        <span class="pill pill-cat">📂 ${product.catName || product.category}</span>
+        ${product.brand  ? `<span class="pill pill-brand">🏷 Thương hiệu: ${product.brand}</span>` : ''}
+        ${product.origin ? `<span class="pill pill-origin">📍 Xuất xứ: ${product.origin}</span>` : ''}
+      </div>
+
+      <div class="product-price-block">
+        <div class="product-price">${formatVND(product.price)}</div>
+        <div class="product-unit">Đơn vị bán: 1 ${product.unit || 'sản phẩm'}</div>
+      </div>
+
+      <div>
+        ${inStock
+          ? `<span class="stock-badge in-stock"><span class="stock-dot">●</span> Còn hàng (${product.stock} sản phẩm)</span>`
+          : `<span class="stock-badge out-stock"><span class="stock-dot">●</span> Hết hàng</span>`}
+      </div>
+
+      ${collapsibles}
+
+      <div class="qty-block">
+        <span class="qty-label">Số lượng:</span>
+        <div class="qty-stepper">
+          <button class="qty-btn" id="qty-minus" onclick="changeQty(-1)" ${!inStock?'disabled':''}>−</button>
+          <input type="number" class="qty-input" id="qty-val" value="1" min="1" max="${maxQty}" ${!inStock?'disabled':''} onchange="clampQty()" />
+          <button class="qty-btn" id="qty-plus"  onclick="changeQty(1)"  ${!inStock?'disabled':''}>+</button>
+        </div>
+      </div>
+
+      <button class="btn-add-cart" onclick="addToCartClick()" ${!inStock?'disabled':''}>
+        ${inStock ? '🛒 Thêm vào giỏ hàng' : '❌ Hết hàng'}
+      </button>
+
+      <div class="product-note">
+        ℹ️ Thông tin sản phẩm chỉ mang tính tham khảo. Vui lòng đọc nhãn sản phẩm thực tế.
+      </div>
+    </div>`;
+}
+
+function buildRelated(product) {
+  if (typeof PRODUCTS === 'undefined') return '';
+  const related = PRODUCTS.filter(p => p.category === product.category && p.id !== product.id).slice(0, 4);
+  if (!related.length) return '';
+  return `
+    <section class="related-section">
+      <h2>Sản phẩm liên quan</h2>
+      <div class="related-grid">
+        ${related.map(p => `
+          <a href="product.html?id=${p.id}" style="text-decoration:none;color:inherit;">
+            <div class="product-card" style="border:1px solid #EDE5DB;border-radius:14px;overflow:hidden;transition:box-shadow 0.2s, transform 0.2s;">
+              <div style="background:${p.color||'#F5E6C8'};height:160px;display:flex;align-items:center;justify-content:center;font-size:56px;">
+                ${p.emoji||'🛒'}
+              </div>
+              <div style="padding:12px 14px;">
+                <div style="font-weight:700;font-size:13.5px;color:#332A25;margin-bottom:6px;line-height:1.4;">${p.name}</div>
+                <div style="color:#D97745;font-weight:800;font-size:15px;">${formatVND(p.price)}</div>
+                <div style="font-size:11px;color:#888;margin-top:4px;">${p.stock>0?'Còn hàng':'Hết hàng'}</div>
+              </div>
+            </div>
+          </a>`).join('')}
+      </div>
+    </section>`;
+}
+
+function renderNotFound() {
+  document.getElementById('product-content').innerHTML = `
+    <div class="not-found-box">
+      <div class="nf-icon">😕</div>
+      <h2>Không tìm thấy sản phẩm</h2>
+      <p>Sản phẩm bạn đang tìm không tồn tại hoặc đã bị xóa.</p>
+      <a href="catalog.html" style="display:inline-block;background:#D97745;color:#fff;padding:12px 28px;border-radius:10px;font-weight:700;text-decoration:none;">
+        ← Quay lại danh mục
+      </a>
+    </div>`;
+}
+
+let currentProduct = null;
+
+function renderProduct(product) {
+  currentProduct = product;
+
+  // Update breadcrumb
+  document.getElementById('bc-cat').innerHTML =
+    `<a href="catalog.html?cat=${product.category}">${product.catName || product.category}</a>`;
+  document.getElementById('bc-name').textContent = product.name;
+  document.title = `${product.name} – Gia Hoa Phat`;
+
+  document.getElementById('product-content').innerHTML = `
+    <div class="product-layout">
+      ${buildGallery(product)}
+      ${buildProductInfo(product)}
+    </div>
+    ${buildRelated(product)}`;
+}
+
+function changeQty(delta) {
+  const input = document.getElementById('qty-val');
+  if (!input) return;
+  const max = parseInt(input.max) || 999;
+  let val = parseInt(input.value) + delta;
+  if (val < 1) val = 1;
+  if (val > max) val = max;
+  input.value = val;
+}
+
+function clampQty() {
+  const input = document.getElementById('qty-val');
+  if (!input) return;
+  const max = parseInt(input.max) || 999;
+  if (parseInt(input.value) < 1) input.value = 1;
+  if (parseInt(input.value) > max) input.value = max;
+}
+
+function addToCartClick() {
+  if (!currentProduct) return;
+  const qty = parseInt(document.getElementById('qty-val').value) || 1;
+  handleAddToCart(currentProduct, qty);
+}
+
+// Click outside modal to close
+document.getElementById('login-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeLoginModal();
+});
+
+// Init page after DOM + main.js ready
+function initProductPage() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get('id');
+  if (!id) { renderNotFound(); return; }
+
+  if (typeof PRODUCTS !== 'undefined') {
+    const p = getProductById(id);
+    p ? renderProduct(p) : renderNotFound();
+  } else {
+    // Wait for main.js PRODUCTS
+    let attempts = 0;
+    const timer = setInterval(() => {
+      attempts++;
+      if (typeof PRODUCTS !== 'undefined') {
+        clearInterval(timer);
+        const p = getProductById(id);
+        p ? renderProduct(p) : renderNotFound();
+      } else if (attempts > 20) {
+        clearInterval(timer);
+        renderNotFound();
+      }
+    }, 100);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  initProductPage();
+
+  // Render shared header if the function exists
+  if (typeof renderHeader === 'function') renderHeader();
+  if (typeof updateCartCount === 'function') updateCartCount();
+});
+</script>
+</body>
+</html>

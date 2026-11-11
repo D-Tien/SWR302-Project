@@ -1,0 +1,750 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Đăng nhập / Đăng ký – Gia Hoà Phát</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:wght@400;600;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="styles/main.css" />
+  <style>
+    /* ── Page-specific overrides ── */
+    .auth-page {
+      min-height: 100vh;
+      background: var(--color-secondary, #FFF8F0);
+      display: flex;
+      flex-direction: column;
+    }
+    .auth-main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2rem 1rem 3rem;
+    }
+    .auth-card {
+      background: #fff;
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(51,42,37,.10);
+      width: 100%;
+      max-width: 480px;
+      overflow: hidden;
+    }
+    /* Tabs */
+    .auth-tabs {
+      display: flex;
+      border-bottom: 2px solid var(--color-border, #EDE5DB);
+    }
+    .auth-tab-btn {
+      flex: 1;
+      padding: 1rem;
+      border: none;
+      background: none;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: var(--color-text-muted, #9C8A7E);
+      cursor: pointer;
+      transition: color .2s, border-color .2s;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -2px;
+    }
+    .auth-tab-btn.active {
+      color: var(--color-primary, #D97745);
+      border-bottom-color: var(--color-primary, #D97745);
+    }
+    /* Tab panels */
+    .auth-panel {
+      display: none;
+      padding: 2rem;
+    }
+    .auth-panel.active { display: block; }
+    /* Form elements */
+    .auth-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      color: var(--color-text, #332A25);
+      margin-bottom: .4rem;
+    }
+    .auth-subtitle {
+      font-size: .9rem;
+      color: var(--color-text-muted, #9C8A7E);
+      margin-bottom: 1.5rem;
+    }
+    .form-group {
+      margin-bottom: 1.1rem;
+    }
+    .form-group label {
+      display: block;
+      font-size: .875rem;
+      font-weight: 600;
+      color: var(--color-text, #332A25);
+      margin-bottom: .4rem;
+    }
+    .input-wrap {
+      position: relative;
+    }
+    .input-wrap .form-control {
+      width: 100%;
+      padding: .7rem 1rem;
+      border: 1.5px solid var(--color-border, #EDE5DB);
+      border-radius: 8px;
+      font-family: 'Nunito', sans-serif;
+      font-size: .95rem;
+      color: var(--color-text, #332A25);
+      background: #fff;
+      transition: border-color .2s, box-shadow .2s;
+      box-sizing: border-box;
+    }
+    .input-wrap .form-control:focus {
+      outline: none;
+      border-color: var(--color-primary, #D97745);
+      box-shadow: 0 0 0 3px rgba(217,119,69,.15);
+    }
+    .input-wrap .form-control.error {
+      border-color: #E53E3E;
+    }
+    .input-wrap .toggle-pw {
+      position: absolute;
+      right: .8rem;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--color-text-muted, #9C8A7E);
+      font-size: 1.1rem;
+      padding: 0;
+      display: flex;
+      align-items: center;
+    }
+    .field-error {
+      font-size: .8rem;
+      color: #E53E3E;
+      margin-top: .25rem;
+      display: none;
+    }
+    .field-error.show { display: block; }
+    /* Password strength */
+    .pw-strength {
+      margin-top: .4rem;
+    }
+    .pw-strength-bar {
+      display: flex;
+      gap: 4px;
+      margin-bottom: .2rem;
+    }
+    .pw-strength-bar span {
+      flex: 1;
+      height: 4px;
+      border-radius: 2px;
+      background: #EDE5DB;
+      transition: background .3s;
+    }
+    .pw-strength-bar span.weak   { background: #E53E3E; }
+    .pw-strength-bar span.medium { background: #ECC94B; }
+    .pw-strength-bar span.strong { background: #38A169; }
+    .pw-strength-label {
+      font-size: .75rem;
+      color: var(--color-text-muted, #9C8A7E);
+    }
+    /* Demo credentials box */
+    .demo-box {
+      background: #FFF8F0;
+      border: 1px dashed #D97745;
+      border-radius: 8px;
+      padding: .8rem 1rem;
+      margin-bottom: 1.2rem;
+    }
+    .demo-box p {
+      font-size: .78rem;
+      color: var(--color-text, #332A25);
+      margin: 0 0 .3rem;
+      font-weight: 700;
+    }
+    .demo-box ul {
+      margin: 0;
+      padding-left: 1rem;
+    }
+    .demo-box ul li {
+      font-size: .78rem;
+      color: #555;
+      margin-bottom: .15rem;
+    }
+    .demo-box code {
+      font-size: .75rem;
+      background: rgba(217,119,69,.12);
+      border-radius: 4px;
+      padding: 0 3px;
+    }
+    /* Forgot password */
+    .forgot-link {
+      display: block;
+      text-align: right;
+      font-size: .82rem;
+      color: var(--color-primary, #D97745);
+      text-decoration: none;
+      margin-top: -.5rem;
+      margin-bottom: 1rem;
+    }
+    .forgot-link:hover { text-decoration: underline; }
+    /* Buttons */
+    .btn-auth {
+      display: block;
+      width: 100%;
+      padding: .85rem;
+      background: var(--color-primary, #D97745);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Nunito', sans-serif;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: background .2s, transform .15s;
+      margin-top: .4rem;
+    }
+    .btn-auth:hover { background: #c4663a; transform: translateY(-1px); }
+    .btn-auth:active { transform: translateY(0); }
+    /* Alert */
+    .auth-alert {
+      border-radius: 8px;
+      padding: .7rem 1rem;
+      font-size: .88rem;
+      margin-bottom: 1rem;
+      display: none;
+    }
+    .auth-alert.show { display: block; }
+    .auth-alert.error { background: #FFF5F5; border: 1px solid #FED7D7; color: #C53030; }
+    .auth-alert.success { background: #F0FFF4; border: 1px solid #C6F6D5; color: #276749; }
+    /* Note box */
+    .info-note {
+      background: #EBF8FF;
+      border-left: 3px solid #63B3ED;
+      border-radius: 0 6px 6px 0;
+      padding: .6rem .9rem;
+      font-size: .82rem;
+      color: #2C5282;
+      margin-bottom: 1.2rem;
+    }
+    /* Email verification screen */
+    .verify-screen {
+      text-align: center;
+      padding: 2rem;
+    }
+    .verify-screen .envelope-icon {
+      font-size: 4rem;
+      margin-bottom: 1rem;
+    }
+    .verify-screen h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.5rem;
+      color: var(--color-text, #332A25);
+      margin-bottom: .5rem;
+    }
+    .verify-screen p {
+      font-size: .9rem;
+      color: var(--color-text-muted, #9C8A7E);
+      margin-bottom: 1.5rem;
+    }
+    .verify-screen .verify-email-addr {
+      font-weight: 700;
+      color: var(--color-text, #332A25);
+    }
+    .btn-resend {
+      background: none;
+      border: 1.5px solid var(--color-primary, #D97745);
+      color: var(--color-primary, #D97745);
+      border-radius: 8px;
+      padding: .6rem 1.4rem;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: .9rem;
+      cursor: pointer;
+      transition: background .2s, color .2s;
+      margin-bottom: .8rem;
+    }
+    .btn-resend:hover:not(:disabled) { background: var(--color-primary, #D97745); color: #fff; }
+    .btn-resend:disabled { opacity: .5; cursor: not-allowed; }
+    .back-to-login {
+      display: block;
+      margin-top: .5rem;
+      font-size: .85rem;
+      color: var(--color-primary, #D97745);
+      text-decoration: none;
+      cursor: pointer;
+    }
+    .back-to-login:hover { text-decoration: underline; }
+    .btn-simulate {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: .5rem 1.2rem;
+      background: var(--color-accent, #789B75);
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-family: 'Nunito', sans-serif;
+      font-weight: 700;
+      font-size: .85rem;
+      cursor: pointer;
+    }
+    .btn-simulate:hover { background: #5f7d5d; }
+    /* Header minimal */
+    .site-header {
+      background: #fff;
+      border-bottom: 1px solid var(--color-border, #EDE5DB);
+      padding: 0 1rem;
+    }
+    .header-inner {
+      max-width: 1200px;
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      gap: 1rem;
+    }
+    .logo-link {
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      gap: .5rem;
+    }
+    .logo-badge {
+      width: 40px;
+      height: 40px;
+      background: var(--color-primary, #D97745);
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-family: 'Playfair Display', serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+    }
+    .logo-text { display: flex; flex-direction: column; }
+    .logo-text strong {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      color: var(--color-primary, #D97745);
+      line-height: 1.1;
+    }
+    .logo-text span {
+      font-size: .7rem;
+      color: var(--color-text-muted, #9C8A7E);
+    }
+    .header-nav { display: flex; align-items: center; gap: 1.2rem; }
+    .header-nav a {
+      font-size: .88rem;
+      color: var(--color-text, #332A25);
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .header-nav a:hover { color: var(--color-primary, #D97745); }
+    .cart-link {
+      position: relative;
+      text-decoration: none;
+      color: var(--color-text, #332A25);
+      font-size: 1.3rem;
+    }
+    .cart-badge {
+      position: absolute;
+      top: -6px;
+      right: -8px;
+      background: var(--color-primary, #D97745);
+      color: #fff;
+      border-radius: 50%;
+      width: 18px;
+      height: 18px;
+      font-size: .65rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+    }
+    @media (max-width: 480px) {
+      .header-nav { gap: .7rem; }
+      .header-nav a { font-size: .8rem; }
+    }
+  </style>
+</head>
+<body class="auth-page">
+
+  <!-- ── Header ── -->
+  <header class="site-header">
+    <div class="header-inner">
+      <a href="index.html" class="logo-link">
+        <div class="logo-badge">GHP</div>
+        <div class="logo-text">
+          <strong>Gia Hoà Phát</strong>
+          <span>Nguyên liệu làm bánh</span>
+        </div>
+      </a>
+      <nav class="header-nav">
+        <a href="index.html">Trang chủ</a>
+        <a href="catalog.html">Sản phẩm</a>
+        <a href="cart.html" class="cart-link">🛒<span class="cart-badge" id="cartCount">0</span></a>
+      </nav>
+    </div>
+  </header>
+
+  <!-- ── Main ── -->
+  <main class="auth-main">
+    <div class="auth-card" id="authCard">
+      <!-- Tabs -->
+      <div class="auth-tabs">
+        <button class="auth-tab-btn active" id="tabLoginBtn" onclick="switchTab('login')">Đăng nhập</button>
+        <button class="auth-tab-btn" id="tabRegisterBtn" onclick="switchTab('register')">Đăng ký</button>
+      </div>
+
+      <!-- ── LOGIN PANEL ── -->
+      <div class="auth-panel active" id="panelLogin">
+        <h1 class="auth-title">Chào mừng trở lại!</h1>
+        <p class="auth-subtitle">Đăng nhập để mua sắm và quản lý đơn hàng của bạn.</p>
+
+        <!-- Demo credentials -->
+        <div class="demo-box">
+          <p>🔑 Tài khoản demo:</p>
+          <ul>
+            <li>Khách hàng: <code>lan@example.com</code> / <code>Demo@123</code></li>
+            <li>Sales: <code>minh.sales@ghp.vn</code> / <code>Admin@123</code></li>
+            <li>Admin: <code>admin@ghp.vn</code> / <code>Admin@123</code></li>
+          </ul>
+        </div>
+
+        <div class="auth-alert error" id="loginError">Email/SĐT hoặc mật khẩu không đúng.</div>
+
+        <form id="loginForm" novalidate>
+          <div class="form-group">
+            <label for="loginIdentifier">Email hoặc số điện thoại</label>
+            <div class="input-wrap">
+              <input type="text" id="loginIdentifier" class="form-control" placeholder="email@example.com hoặc 09xxxxxxxx" autocomplete="username" />
+            </div>
+            <div class="field-error" id="loginIdentifierErr">Vui lòng nhập email hoặc số điện thoại.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="loginPassword">Mật khẩu</label>
+            <div class="input-wrap">
+              <input type="password" id="loginPassword" class="form-control" placeholder="Nhập mật khẩu" style="padding-right:2.5rem" autocomplete="current-password" />
+              <button type="button" class="toggle-pw" onclick="togglePw('loginPassword', this)" aria-label="Hiện/ẩn mật khẩu">👁️</button>
+            </div>
+            <div class="field-error" id="loginPasswordErr">Vui lòng nhập mật khẩu.</div>
+          </div>
+
+          <a href="forgot-password.html" class="forgot-link">Quên mật khẩu?</a>
+
+          <button type="submit" class="btn-auth">Đăng nhập</button>
+        </form>
+      </div>
+
+      <!-- ── REGISTER PANEL ── -->
+      <div class="auth-panel" id="panelRegister">
+        <h1 class="auth-title">Tạo tài khoản mới</h1>
+        <div class="info-note">ℹ️ Chỉ dành cho khách hàng. Nhân viên vui lòng liên hệ quản trị viên để được cấp tài khoản.</div>
+
+        <div class="auth-alert error" id="registerError"></div>
+
+        <form id="registerForm" novalidate>
+          <div class="form-group">
+            <label for="regName">Họ và tên <span style="color:#E53E3E">*</span></label>
+            <div class="input-wrap">
+              <input type="text" id="regName" class="form-control" placeholder="Nguyễn Văn A" />
+            </div>
+            <div class="field-error" id="regNameErr">Vui lòng nhập họ và tên.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="regEmail">Email <span style="color:#E53E3E">*</span></label>
+            <div class="input-wrap">
+              <input type="email" id="regEmail" class="form-control" placeholder="email@example.com" autocomplete="email" />
+            </div>
+            <div class="field-error" id="regEmailErr">Vui lòng nhập email hợp lệ.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="regPhone">Số điện thoại <span style="color:#E53E3E">*</span></label>
+            <div class="input-wrap">
+              <input type="tel" id="regPhone" class="form-control" placeholder="0901234567" autocomplete="tel" />
+            </div>
+            <div class="field-error" id="regPhoneErr">Số điện thoại phải có 10 chữ số và bắt đầu bằng 0.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="regPassword">Mật khẩu <span style="color:#E53E3E">*</span></label>
+            <div class="input-wrap">
+              <input type="password" id="regPassword" class="form-control" placeholder="Tối thiểu 8 ký tự" style="padding-right:2.5rem" autocomplete="new-password" oninput="checkStrength(this.value)" />
+              <button type="button" class="toggle-pw" onclick="togglePw('regPassword', this)" aria-label="Hiện/ẩn mật khẩu">👁️</button>
+            </div>
+            <div class="pw-strength" id="strengthIndicator" style="display:none">
+              <div class="pw-strength-bar">
+                <span id="bar1"></span><span id="bar2"></span><span id="bar3"></span>
+              </div>
+              <div class="pw-strength-label" id="strengthLabel"></div>
+            </div>
+            <div class="field-error" id="regPasswordErr">Mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa và 1 chữ số.</div>
+          </div>
+
+          <div class="form-group">
+            <label for="regConfirm">Xác nhận mật khẩu <span style="color:#E53E3E">*</span></label>
+            <div class="input-wrap">
+              <input type="password" id="regConfirm" class="form-control" placeholder="Nhập lại mật khẩu" style="padding-right:2.5rem" autocomplete="new-password" />
+              <button type="button" class="toggle-pw" onclick="togglePw('regConfirm', this)" aria-label="Hiện/ẩn mật khẩu">👁️</button>
+            </div>
+            <div class="field-error" id="regConfirmErr">Mật khẩu xác nhận không khớp.</div>
+          </div>
+
+          <button type="submit" class="btn-auth">Đăng ký</button>
+        </form>
+      </div>
+    </div>
+
+    <!-- ── EMAIL VERIFICATION SCREEN ── -->
+    <div class="auth-card" id="verifyCard" style="display:none">
+      <div class="verify-screen">
+        <div class="envelope-icon">✉️</div>
+        <h2>Xác minh email của bạn</h2>
+        <p>Chúng tôi đã gửi email xác minh đến<br>
+           <span class="verify-email-addr" id="verifyEmailAddr"></span><br>
+           Vui lòng kiểm tra hộp thư và nhấp vào liên kết xác minh.
+        </p>
+        <button class="btn-resend" id="resendBtn" onclick="startResendCountdown()">Gửi lại email</button>
+        <div id="resendCountdown" style="font-size:.8rem;color:#9C8A7E;margin-bottom:.5rem;display:none"></div>
+
+        <button class="btn-simulate" onclick="simulateVerification()">🧪 Giả lập xác minh thành công</button>
+
+        <br>
+        <a class="back-to-login" onclick="showAuthCard()">← Quay lại đăng nhập</a>
+      </div>
+    </div>
+  </main>
+
+  <!-- ── Footer ── -->
+  <footer style="text-align:center;padding:1rem;font-size:.78rem;color:#9C8A7E;border-top:1px solid #EDE5DB;background:#fff;">
+    © 2024 Gia Hoà Phát. Demo project – SWR302. Không có giao dịch thực.
+  </footer>
+
+  <script src="scripts/main.js" defer></script>
+  <script>
+    /* ── Tab switching ── */
+    function switchTab(tab) {
+      document.getElementById('tabLoginBtn').classList.toggle('active', tab === 'login');
+      document.getElementById('tabRegisterBtn').classList.toggle('active', tab === 'register');
+      document.getElementById('panelLogin').classList.toggle('active', tab === 'login');
+      document.getElementById('panelRegister').classList.toggle('active', tab === 'register');
+      clearErrors();
+    }
+
+    /* ── Toggle password visibility ── */
+    function togglePw(inputId, btn) {
+      const input = document.getElementById(inputId);
+      if (input.type === 'password') { input.type = 'text'; btn.textContent = '🙈'; }
+      else { input.type = 'password'; btn.textContent = '👁️'; }
+    }
+
+    /* ── Password strength ── */
+    function checkStrength(val) {
+      const indicator = document.getElementById('strengthIndicator');
+      if (!val) { indicator.style.display = 'none'; return; }
+      indicator.style.display = 'block';
+      const hasUpper = /[A-Z]/.test(val);
+      const hasNum   = /[0-9]/.test(val);
+      const hasSpecial = /[^A-Za-z0-9]/.test(val);
+      let score = 0;
+      if (val.length >= 8) score++;
+      if (hasUpper && hasNum) score++;
+      if (hasSpecial && val.length >= 10) score++;
+      const labels = ['', 'Yếu', 'Trung bình', 'Mạnh'];
+      const cls    = ['', 'weak', 'medium', 'strong'];
+      const colors = ['', '#E53E3E', '#ECC94B', '#38A169'];
+      document.getElementById('strengthLabel').textContent = labels[score] || 'Yếu';
+      document.getElementById('strengthLabel').style.color = colors[score] || '#E53E3E';
+      for (let i = 1; i <= 3; i++) {
+        const bar = document.getElementById('bar' + i);
+        bar.className = i <= score ? cls[score] : '';
+      }
+    }
+
+    /* ── Clear errors ── */
+    function clearErrors() {
+      document.querySelectorAll('.field-error').forEach(el => el.classList.remove('show'));
+      document.querySelectorAll('.form-control').forEach(el => el.classList.remove('error'));
+      document.querySelectorAll('.auth-alert').forEach(el => el.classList.remove('show'));
+    }
+
+    function showErr(fieldId, errId, msg) {
+      const field = document.getElementById(fieldId);
+      const err   = document.getElementById(errId);
+      if (field) field.classList.add('error');
+      if (err) { if (msg) err.textContent = msg; err.classList.add('show'); }
+    }
+
+    /* ── LOGIN ── */
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      clearErrors();
+      const identifier = document.getElementById('loginIdentifier').value.trim();
+      const password   = document.getElementById('loginPassword').value;
+      let valid = true;
+      if (!identifier) { showErr('loginIdentifier', 'loginIdentifierErr'); valid = false; }
+      if (!password)   { showErr('loginPassword', 'loginPasswordErr'); valid = false; }
+      if (!valid) return;
+
+      // Try to get SAMPLE_USERS from main.js (global)
+      const users = (typeof SAMPLE_USERS !== 'undefined') ? SAMPLE_USERS : [
+        {id:1,name:"Nguyễn Thị Lan",email:"lan@example.com",phone:"0901234567",password:"Demo@123",role:"customer"},
+        {id:2,name:"Trần Văn Minh",email:"minh.sales@ghp.vn",phone:"0912345678",password:"Admin@123",role:"sales_staff"},
+        {id:3,name:"Lê Thị Hoa",email:"hoa.inventory@ghp.vn",phone:"0923456789",password:"Admin@123",role:"inventory_staff"},
+        {id:4,name:"Phạm Văn Đức",email:"duc.manager@ghp.vn",phone:"0934567890",password:"Admin@123",role:"manager"},
+        {id:5,name:"Admin GHP",email:"admin@ghp.vn",phone:"0945678901",password:"Admin@123",role:"administrator"}
+      ];
+
+      const user = users.find(u =>
+        (u.email === identifier || u.phone === identifier) && u.password === password
+      );
+
+      if (!user) {
+        const alertEl = document.getElementById('loginError');
+        alertEl.classList.add('show');
+        return;
+      }
+
+      // Save to sessionStorage
+      const sessionUser = { id: user.id, name: user.name, email: user.email, phone: user.phone, role: user.role };
+      sessionStorage.setItem('ghp_user', JSON.stringify(sessionUser));
+
+      // Redirect by role
+      const redirectMap = {
+        customer:         'index.html',
+        sales_staff:      'admin/orders.html',
+        inventory_staff:  'admin/products.html',
+        manager:          'admin/reports.html',
+        administrator:    'admin/users.html'
+      };
+      window.location.href = redirectMap[user.role] || 'index.html';
+    });
+
+    /* ── REGISTER ── */
+    document.getElementById('registerForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      clearErrors();
+
+      const name     = document.getElementById('regName').value.trim();
+      const email    = document.getElementById('regEmail').value.trim().toLowerCase();
+      const phone    = document.getElementById('regPhone').value.trim();
+      const password = document.getElementById('regPassword').value;
+      const confirm  = document.getElementById('regConfirm').value;
+
+      let valid = true;
+
+      if (!name) { showErr('regName', 'regNameErr', 'Vui lòng nhập họ và tên.'); valid = false; }
+
+      const emailRx = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!email || !emailRx.test(email)) { showErr('regEmail', 'regEmailErr', 'Vui lòng nhập email hợp lệ.'); valid = false; }
+
+      if (!/^0\d{9}$/.test(phone)) { showErr('regPhone', 'regPhoneErr', 'Số điện thoại phải có 10 chữ số và bắt đầu bằng 0.'); valid = false; }
+
+      const pwRx = /^(?=.*[A-Z])(?=.*[0-9]).{8,}$/;
+      if (!pwRx.test(password)) { showErr('regPassword', 'regPasswordErr', 'Mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa và 1 chữ số.'); valid = false; }
+
+      if (password !== confirm) { showErr('regConfirm', 'regConfirmErr', 'Mật khẩu xác nhận không khớp.'); valid = false; }
+
+      if (!valid) return;
+
+      // Check duplicates
+      const users = (typeof SAMPLE_USERS !== 'undefined') ? SAMPLE_USERS : [
+        {id:1,name:"Nguyễn Thị Lan",email:"lan@example.com",phone:"0901234567",password:"Demo@123",role:"customer"},
+        {id:2,name:"Trần Văn Minh",email:"minh.sales@ghp.vn",phone:"0912345678",password:"Admin@123",role:"sales_staff"},
+        {id:3,name:"Lê Thị Hoa",email:"hoa.inventory@ghp.vn",phone:"0923456789",password:"Admin@123",role:"inventory_staff"},
+        {id:4,name:"Phạm Văn Đức",email:"duc.manager@ghp.vn",phone:"0934567890",password:"Admin@123",role:"manager"},
+        {id:5,name:"Admin GHP",email:"admin@ghp.vn",phone:"0945678901",password:"Admin@123",role:"administrator"}
+      ];
+
+      if (users.some(u => u.email === email)) {
+        const errEl = document.getElementById('registerError');
+        errEl.textContent = 'Email này đã được đăng ký. Vui lòng dùng email khác.';
+        errEl.classList.add('show');
+        showErr('regEmail', 'regEmailErr', 'Email này đã được đăng ký.');
+        return;
+      }
+
+      if (users.some(u => u.phone === phone)) {
+        const errEl = document.getElementById('registerError');
+        errEl.textContent = 'Số điện thoại này đã được đăng ký. Vui lòng dùng số khác.';
+        errEl.classList.add('show');
+        showErr('regPhone', 'regPhoneErr', 'Số điện thoại này đã được đăng ký.');
+        return;
+      }
+
+      // Show verification screen
+      document.getElementById('verifyEmailAddr').textContent = email;
+      document.getElementById('authCard').style.display   = 'none';
+      document.getElementById('verifyCard').style.display = 'block';
+    });
+
+    /* ── Resend countdown ── */
+    let resendTimer = null;
+    function startResendCountdown() {
+      const btn      = document.getElementById('resendBtn');
+      const countdown = document.getElementById('resendCountdown');
+      btn.disabled = true;
+      countdown.style.display = 'block';
+      let secs = 60;
+      countdown.textContent = 'Gửi lại sau ' + secs + 's';
+      resendTimer = setInterval(() => {
+        secs--;
+        countdown.textContent = 'Gửi lại sau ' + secs + 's';
+        if (secs <= 0) {
+          clearInterval(resendTimer);
+          btn.disabled = false;
+          countdown.style.display = 'none';
+        }
+      }, 1000);
+    }
+
+    /* ── Simulate verification ── */
+    function simulateVerification() {
+      const email = document.getElementById('verifyEmailAddr').textContent;
+      // Auto-login as new customer (simulated)
+      const newUser = { id: Date.now(), name: document.getElementById('regName').value.trim(), email, role: 'customer' };
+      sessionStorage.setItem('ghp_user', JSON.stringify(newUser));
+      if (typeof showToast === 'function') showToast('🎉 Xác minh thành công! Chào mừng bạn!', 'success');
+      setTimeout(() => window.location.href = 'index.html', 1200);
+    }
+
+    /* ── Back to auth card ── */
+    function showAuthCard() {
+      document.getElementById('verifyCard').style.display = 'none';
+      document.getElementById('authCard').style.display = 'block';
+      switchTab('login');
+    }
+
+    /* ── Update cart count on load ── */
+    document.addEventListener('DOMContentLoaded', function() {
+      if (typeof updateCartCount === 'function') updateCartCount();
+      else {
+        try {
+          const cart = JSON.parse(localStorage.getItem('ghp_cart') || '[]');
+          const total = cart.reduce((s, i) => s + (i.qty || 1), 0);
+          const badge = document.getElementById('cartCount');
+          if (badge) badge.textContent = total;
+        } catch {}
+      }
+      // If already logged in, redirect
+      try {
+        const u = JSON.parse(sessionStorage.getItem('ghp_user'));
+        if (u && u.role) {
+          const redirectMap = {
+            customer:'index.html',sales_staff:'admin/orders.html',
+            inventory_staff:'admin/products.html',manager:'admin/reports.html',
+            administrator:'admin/users.html'
+          };
+          window.location.href = redirectMap[u.role] || 'index.html';
+        }
+      } catch {}
+    });
+  </script>
+</body>
+</html>

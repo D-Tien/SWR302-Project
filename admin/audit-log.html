@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Nhật ký Kiểm tra – GHP Admin</title>
+  <link rel="stylesheet" href="../styles/main.css">
+  <link rel="stylesheet" href="admin.css">
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
+  <style>
+    /* Audit log specific styling */
+    .action-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      padding: 4px 10px;
+      border-radius: 16px;
+      font-size: 11.5px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .action-badge.create { background: #DBEAFE; color: #1E40AF; }
+    .action-badge.disable { background: #FEE2E2; color: #991B1B; }
+    .action-badge.enable { background: #D1FAE5; color: #065F46; }
+    .action-badge.permission { background: #EDE9FE; color: #5B21B6; }
+    .action-badge.config { background: #FFEDD5; color: #9A3412; }
+    .action-badge.default { background: #F3F4F6; color: #374151; }
+
+    .header-notice-box {
+      background: #EFF6FF;
+      border-left: 4px solid #3B82F6;
+      padding: 14px 18px;
+      border-radius: 0 8px 8px 0;
+      font-size: 13.5px;
+      color: #1E40AF;
+      margin-bottom: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+    .header-notice-sub {
+      font-size: 12px;
+      color: #6B7280;
+      background: #DBEAFE;
+      padding: 3px 8px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+
+    .time-cell {
+      font-family: monospace;
+      font-size: 12.5px;
+      color: #4B5563;
+      white-space: nowrap;
+    }
+    .actor-cell {
+      font-weight: 700;
+      color: #332A25;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+    .target-cell {
+      font-weight: 600;
+      color: #D97745;
+    }
+    .details-cell {
+      color: #4B5563;
+      font-size: 13px;
+      line-height: 1.45;
+    }
+
+    /* 403 Forbidden */
+    .forbidden-wrap {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 50vh;
+      text-align: center;
+      padding: 40px 20px;
+    }
+    .forbidden-code { font-size: 64px; font-weight: 800; color: #DC2626; line-height: 1; }
+    .forbidden-title { font-size: 22px; font-weight: 700; margin: 12px 0 8px; color: #332A25; }
+    .forbidden-desc { color: #777; font-size: 14px; max-width: 440px; margin-bottom: 24px; }
+  </style>
+</head>
+<body>
+
+<div class="admin-layout">
+
+  <!-- Mobile Backdrop -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar" id="adminSidebar">
+    <div class="logo">
+      <div class="logo-brand">GHP OSBIS</div>
+      <div class="logo-sub">Back Office</div>
+    </div>
+
+    <div class="nav-section-title">Quản trị hệ thống</div>
+    <a href="users.html" class="nav-item">
+      <span class="nav-icon">👥</span>
+      <span>Quản lý Người dùng</span>
+    </a>
+    <a href="delivery-config.html" class="nav-item">
+      <span class="nav-icon">🚚</span>
+      <span>Cấu hình Giao hàng</span>
+    </a>
+    <a href="audit-log.html" class="nav-item active">
+      <span class="nav-icon">📋</span>
+      <span>Nhật ký Kiểm tra</span>
+    </a>
+
+    <div class="nav-section-title">Phân hệ khác</div>
+    <a href="orders.html" class="nav-item">
+      <span class="nav-icon">📦</span>
+      <span>Quản lý Đơn hàng</span>
+    </a>
+    <a href="reports.html" class="nav-item">
+      <span class="nav-icon">📈</span>
+      <span>Báo cáo Doanh thu</span>
+    </a>
+
+    <div class="sidebar-footer">
+      <a href="../index.html" class="nav-item" style="border-radius:8px;">
+        <span class="nav-icon">🏠</span>
+        <span>Về trang chủ</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Content Area -->
+  <div class="admin-content">
+
+    <!-- Topbar -->
+    <header class="admin-topbar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+        <nav class="admin-breadcrumb">
+          <a href="../index.html">GHP</a>
+          <span class="sep">›</span>
+          <a href="users.html">Admin</a>
+          <span class="sep">›</span>
+          <span class="current">Nhật ký Kiểm tra</span>
+        </nav>
+      </div>
+      <div class="admin-topbar-right">
+        <span class="role-badge administrator" id="topRoleBadge">Quản trị viên</span>
+        <span class="admin-user-name" id="topUserName">Admin GHP</span>
+        <button class="btn-logout" onclick="doLogout()">Đăng xuất</button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="admin-main">
+
+      <!-- 403 Forbidden Container -->
+      <div id="forbiddenContainer" class="forbidden-wrap" style="display:none;">
+        <div class="forbidden-code">403</div>
+        <div class="forbidden-title">Truy cập bị từ chối</div>
+        <p class="forbidden-desc">Bạn không có quyền truy cập nhật ký kiểm tra. Chức năng này chỉ dành riêng cho Quản trị viên (Administrator).</p>
+        <a href="../index.html" class="btn btn-primary">Về trang chủ</a>
+      </div>
+
+      <!-- Administrator Content -->
+      <div id="adminContent">
+
+        <div style="margin-bottom:18px;">
+          <div class="page-title" style="margin-bottom:4px;">📋 Nhật ký Kiểm tra (Audit Log)</div>
+          <div class="page-subtitle">Nhật ký ghi nhận các thay đổi quan trọng trong hệ thống – Chỉ đọc.</div>
+        </div>
+
+        <!-- System Notice -->
+        <div class="header-notice-box">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span style="font-size:20px;">🔒</span>
+            <div>
+              <strong>Nhật ký ghi nhận các thay đổi quan trọng trong hệ thống – Chỉ đọc.</strong>
+              <div style="font-size:12.5px;color:#3B82F6;margin-top:2px;">
+                Mọi hành vi tạo tài khoản, đổi phân quyền, vô hiệu hóa tài khoản và thay đổi cấu hình giao hàng đều được lưu trữ vĩnh viễn.
+              </div>
+            </div>
+          </div>
+          <span class="header-notice-sub">Dữ liệu demo. Nhật ký thực tế sẽ được ghi vào cơ sở dữ liệu.</span>
+        </div>
+
+        <!-- KPI Cards -->
+        <div class="kpi-grid">
+          <div class="kpi-card blue">
+            <div class="kpi-label">Tổng bản ghi</div>
+            <div class="kpi-value" id="kpiTotalLogs">0</div>
+            <div class="kpi-sub">Lịch sử hệ thống</div>
+          </div>
+          <div class="kpi-card green">
+            <div class="kpi-label">Tài khoản & Phân quyền</div>
+            <div class="kpi-value" id="kpiUserLogs">0</div>
+            <div class="kpi-sub">User & Role actions</div>
+          </div>
+          <div class="kpi-card orange">
+            <div class="kpi-label">Cấu hình vận hành</div>
+            <div class="kpi-value" id="kpiConfigLogs">0</div>
+            <div class="kpi-sub">Giao hàng & biểu phí</div>
+          </div>
+          <div class="kpi-card purple">
+            <div class="kpi-label">Người thực hiện</div>
+            <div class="kpi-value" id="kpiActors">1</div>
+            <div class="kpi-sub">Quản trị viên ghi nhận</div>
+          </div>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar">
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:13px;font-weight:700;color:#666;">Từ ngày:</span>
+            <input type="date" id="dateFrom" class="filter-input" style="min-width:140px;" onchange="applyFilters()" />
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <span style="font-size:13px;font-weight:700;color:#666;">Đến ngày:</span>
+            <input type="date" id="dateTo" class="filter-input" style="min-width:140px;" onchange="applyFilters()" />
+          </div>
+          <input type="text" id="actorSearch" class="filter-input" placeholder="🔍 Tìm người thực hiện, đối tượng..." oninput="applyFilters()" />
+          <select id="actionFilter" class="filter-select" onchange="applyFilters()">
+            <option value="">Tất cả hành động</option>
+            <option value="Tạo tài khoản">Tạo tài khoản</option>
+            <option value="Phân quyền">Phân quyền</option>
+            <option value="Vô hiệu hóa">Vô hiệu hóa</option>
+            <option value="Kích hoạt">Kích hoạt</option>
+            <option value="Cấu hình giao hàng">Cấu hình giao hàng</option>
+          </select>
+          <button class="btn btn-secondary" onclick="resetFilters()">✕ Xóa bộ lọc</button>
+        </div>
+
+        <!-- Table Card -->
+        <div class="admin-card">
+          <div class="admin-card-header">
+            <span class="admin-card-title">Lịch sử sự kiện hệ thống</span>
+            <span id="tableCountLabel" style="font-size:13px;color:#888;"></span>
+          </div>
+
+          <div class="table-wrapper">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th style="width:165px;">Thời gian</th>
+                  <th style="width:170px;">Người thực hiện</th>
+                  <th style="width:170px;">Hành động</th>
+                  <th style="width:230px;">Đối tượng</th>
+                  <th>Chi tiết</th>
+                </tr>
+              </thead>
+              <tbody id="auditTableBody"></tbody>
+            </table>
+          </div>
+
+          <div class="empty-state" id="emptyState" style="display:none;">
+            <div class="empty-icon">📋</div>
+            <p>Không có nhật ký nào phù hợp với bộ lọc.</p>
+          </div>
+
+          <!-- Pagination -->
+          <div class="pagination" id="paginationArea" style="margin-top:20px;">
+            <span id="pageInfo"></span>
+            <div class="pagination-controls" id="pageControls"></div>
+          </div>
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="../scripts/main.js"></script>
+<script>
+// ==================== INITIAL DATA ====================
+const DEFAULT_AUDIT_LOGS = [
+  {id:1, time:"2024-11-10T14:30:00", actor:"Admin GHP", action:"Tạo tài khoản", target:"Nguyễn Hữu Bình (binh@example.com)", details:"Tạo tài khoản nhân viên mới vai trò Khách hàng"},
+  {id:2, time:"2024-11-09T10:00:00", actor:"Admin GHP", action:"Vô hiệu hóa", target:"Võ Văn Khoa (khoa.sales@ghp.vn)", details:"Vô hiệu hóa tài khoản nhân viên bán hàng"},
+  {id:3, time:"2024-11-08T16:00:00", actor:"Admin GHP", action:"Cấu hình giao hàng", target:"Phí giao hàng Hà Nội", details:"Cập nhật phí giao hàng Hà Nội từ 25.000 ₫ → 30.000 ₫"},
+  {id:4, time:"2024-11-05T09:30:00", actor:"Admin GHP", action:"Phân quyền", target:"Lê Thị Hoa (hoa.inventory@ghp.vn)", details:"Đổi vai trò từ Khách hàng → Nhân viên Kho"},
+  {id:5, time:"2024-10-30T11:00:00", actor:"Admin GHP", action:"Tạo tài khoản", target:"Đinh Thị Yến (yen.inventory@ghp.vn)", details:"Tạo tài khoản nhân viên mới vai trò Nhân viên Kho"},
+  {id:6, time:"2024-10-28T15:20:00", actor:"Admin GHP", action:"Cấu hình giao hàng", target:"Phí giao hàng Đà Nẵng", details:"Cập nhật phí giao hàng Đà Nẵng từ 28.000 ₫ → 30.000 ₫"},
+  {id:7, time:"2024-10-25T14:10:00", actor:"Admin GHP", action:"Kích hoạt", target:"Lê Thị Hoa (hoa.inventory@ghp.vn)", details:"Kích hoạt lại tài khoản sau kỳ nghỉ phép dài hạn"},
+  {id:8, time:"2024-10-20T08:45:00", actor:"Admin GHP", action:"Tạo tài khoản", target:"Trần Văn Minh (minh.sales@ghp.vn)", details:"Tạo tài khoản nhân viên bán hàng mới"},
+  {id:9, time:"2024-10-18T16:50:00", actor:"Admin GHP", action:"Cấu hình giao hàng", target:"Khu vực mới: Bình Dương", details:"Thêm khu vực giao hàng mới Bình Dương với phí 25.000 ₫"},
+  {id:10, time:"2024-10-15T11:30:00", actor:"Admin GHP", action:"Phân quyền", target:"Phạm Văn Đức (duc.manager@ghp.vn)", details:"Bổ nhiệm vị trí Quản lý chi nhánh & vận hành"},
+  {id:11, time:"2024-10-12T09:15:00", actor:"Admin GHP", action:"Tạo tài khoản", target:"Nguyễn Thị Lan (lan@example.com)", details:"Xác thực tài khoản khách hàng thân thiết"},
+  {id:12, time:"2024-10-10T13:40:00", actor:"Admin GHP", action:"Cấu hình giao hàng", target:"Phí giao hàng TP.HCM Ngoại thành", details:"Cập nhật biểu phí ngoại thành từ 30.000 ₫ → 35.000 ₫"},
+  {id:13, time:"2024-10-05T10:05:00", actor:"Admin GHP", action:"Tạo tài khoản", target:"Trần Thị Mai (mai@example.com)", details:"Tạo tài khoản khách hàng VIP"},
+  {id:14, time:"2024-10-01T08:00:00", actor:"Admin GHP", action:"Cấu hình giao hàng", target:"Khởi tạo biểu phí ban đầu", details:"Thiết lập danh mục 5 tỉnh thành giao hàng trọng điểm"}
+];
+
+if (!localStorage.getItem('ghp_audit_logs')) {
+  localStorage.setItem('ghp_audit_logs', JSON.stringify(DEFAULT_AUDIT_LOGS));
+}
+
+let auditLogs = JSON.parse(localStorage.getItem('ghp_audit_logs'));
+let filteredLogs = [];
+let currentPage = 1;
+const PAGE_SIZE = 20;
+let currentUser = null;
+
+// ==================== AUTH & TOPBAR ====================
+function checkAuth() {
+  const session = sessionStorage.getItem('ghp_user');
+  let u = null;
+  if (session) {
+    try { u = JSON.parse(session); } catch(e){}
+  }
+  // Standalone preview fallback
+  if (!u) {
+    u = { id: 5, name: "Admin GHP", email: "admin@ghp.vn", role: "administrator" };
+    sessionStorage.setItem('ghp_user', JSON.stringify(u));
+  }
+  currentUser = u;
+
+  document.getElementById('topUserName').textContent = u.name || 'Admin';
+  const roleBadge = document.getElementById('topRoleBadge');
+  roleBadge.className = 'role-badge ' + (u.role || 'administrator');
+  roleBadge.textContent = u.role === 'administrator' ? 'Quản trị viên' : u.role;
+
+  if (u.role !== 'administrator') {
+    document.getElementById('adminContent').style.display = 'none';
+    document.getElementById('forbiddenContainer').style.display = 'flex';
+    return false;
+  }
+  document.getElementById('adminContent').style.display = 'block';
+  document.getElementById('forbiddenContainer').style.display = 'none';
+  return true;
+}
+
+function doLogout() {
+  sessionStorage.removeItem('ghp_user');
+  window.location.href = '../login.html';
+}
+
+function toggleSidebar() {
+  document.getElementById('adminSidebar').classList.toggle('open');
+  document.getElementById('sidebarBackdrop').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('adminSidebar').classList.remove('open');
+  document.getElementById('sidebarBackdrop').classList.remove('open');
+}
+
+// ==================== HELPERS ====================
+function fmtDate(iso) {
+  if (!iso) return '–';
+  const d = new Date(iso);
+  const pad = n => String(n).padStart(2, '0');
+  const day = pad(d.getDate());
+  const month = pad(d.getMonth() + 1);
+  const year = d.getFullYear();
+  const hours = pad(d.getHours());
+  const minutes = pad(d.getMinutes());
+  const seconds = pad(d.getSeconds());
+  return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+}
+
+function getActionBadge(action) {
+  let cls = 'default';
+  let icon = '📝';
+  if (action.includes('Tạo tài khoản')) { cls = 'create'; icon = '👤➕'; }
+  else if (action.includes('Vô hiệu hóa')) { cls = 'disable'; icon = '🚫'; }
+  else if (action.includes('Kích hoạt')) { cls = 'enable'; icon = '✅'; }
+  else if (action.includes('Phân quyền')) { cls = 'permission'; icon = '🔑'; }
+  else if (action.includes('Cấu hình')) { cls = 'config'; icon = '⚙️'; }
+  return `<span class="action-badge ${cls}">${icon} ${action}</span>`;
+}
+
+// ==================== KPI SUMMARY ====================
+function renderKPI() {
+  document.getElementById('kpiTotalLogs').textContent = auditLogs.length;
+
+  const userActionKeywords = ['tài khoản', 'phân quyền', 'vô hiệu', 'kích hoạt'];
+  const userLogs = auditLogs.filter(l => userActionKeywords.some(kw => l.action.toLowerCase().includes(kw))).length;
+  document.getElementById('kpiUserLogs').textContent = userLogs;
+
+  const configLogs = auditLogs.filter(l => l.action.toLowerCase().includes('cấu hình')).length;
+  document.getElementById('kpiConfigLogs').textContent = configLogs;
+
+  const uniqueActors = new Set(auditLogs.map(l => l.actor)).size;
+  document.getElementById('kpiActors').textContent = uniqueActors || 1;
+}
+
+// ==================== FILTERS & TABLE ====================
+function applyFilters() {
+  const fromVal = document.getElementById('dateFrom').value;
+  const toVal = document.getElementById('dateTo').value;
+  const search = document.getElementById('actorSearch').value.toLowerCase().trim();
+  const actionF = document.getElementById('actionFilter').value;
+
+  filteredLogs = auditLogs.filter(item => {
+    // Date Range
+    if (fromVal) {
+      const itemDate = new Date(item.time).toISOString().split('T')[0];
+      if (itemDate < fromVal) return false;
+    }
+    if (toVal) {
+      const itemDate = new Date(item.time).toISOString().split('T')[0];
+      if (itemDate > toVal) return false;
+    }
+
+    // Actor / Target / Details search
+    if (search) {
+      const hay = (item.actor + ' ' + item.target + ' ' + item.details + ' ' + item.action).toLowerCase();
+      if (!hay.includes(search)) return false;
+    }
+
+    // Action Type filter
+    if (actionF && !item.action.toLowerCase().includes(actionF.toLowerCase())) {
+      return false;
+    }
+
+    return true;
+  });
+
+  currentPage = 1;
+  renderTable();
+}
+
+function resetFilters() {
+  document.getElementById('dateFrom').value = '';
+  document.getElementById('dateTo').value = '';
+  document.getElementById('actorSearch').value = '';
+  document.getElementById('actionFilter').value = '';
+  applyFilters();
+}
+
+function renderTable() {
+  const total = filteredLogs.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  currentPage = Math.min(currentPage, totalPages);
+
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const slice = filteredLogs.slice(start, start + PAGE_SIZE);
+
+  document.getElementById('tableCountLabel').textContent = `${total} bản ghi`;
+  document.getElementById('emptyState').style.display = total === 0 ? 'block' : 'none';
+  document.getElementById('paginationArea').style.display = total === 0 ? 'none' : 'flex';
+
+  const tbody = document.getElementById('auditTableBody');
+  tbody.innerHTML = slice.map(item => `
+    <tr>
+      <td><span class="time-cell">${fmtDate(item.time)}</span></td>
+      <td>
+        <div class="actor-cell">
+          <span style="font-size:14px;">👤</span>
+          <span>${item.actor}</span>
+        </div>
+      </td>
+      <td>${getActionBadge(item.action)}</td>
+      <td><span class="target-cell">${item.target}</span></td>
+      <td><span class="details-cell">${item.details}</span></td>
+    </tr>
+  `).join('');
+
+  renderPagination(total, totalPages);
+}
+
+function renderPagination(total, totalPages) {
+  const info = document.getElementById('pageInfo');
+  const controls = document.getElementById('pageControls');
+  const start = (currentPage - 1) * PAGE_SIZE + 1;
+  const end = Math.min(currentPage * PAGE_SIZE, total);
+  info.textContent = total > 0 ? `Hiển thị ${start}–${end} / ${total} bản ghi (Trang ${currentPage}/${totalPages})` : '';
+
+  let html = `<button class="page-btn" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹</button>`;
+  for (let p = 1; p <= totalPages; p++) {
+    if (totalPages <= 7 || Math.abs(p - currentPage) <= 2 || p === 1 || p === totalPages) {
+      html += `<button class="page-btn ${p === currentPage ? 'active' : ''}" onclick="goPage(${p})">${p}</button>`;
+    } else if (Math.abs(p - currentPage) === 3) {
+      html += `<span style="padding:0 4px;color:#ccc;">…</span>`;
+    }
+  }
+  html += `<button class="page-btn" onclick="goPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>›</button>`;
+  controls.innerHTML = html;
+}
+
+function goPage(p) {
+  const totalPages = Math.ceil(filteredLogs.length / PAGE_SIZE);
+  if (p < 1 || p > totalPages) return;
+  currentPage = p;
+  renderTable();
+}
+
+// ==================== INIT ====================
+(function init() {
+  if (!checkAuth()) return;
+  renderKPI();
+  applyFilters();
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Quản lý Đơn hàng – GHP Admin</title>
+  <link rel="stylesheet" href="../styles/main.css" />
+  <link rel="stylesheet" href="admin.css" />
+</head>
+<body>
+
+<div class="admin-layout">
+
+  <!-- Sidebar Backdrop (mobile) -->
+  <div class="sidebar-backdrop" id="sidebarBackdrop" onclick="closeSidebar()"></div>
+
+  <!-- Sidebar -->
+  <aside class="admin-sidebar" id="adminSidebar">
+    <div class="logo">
+      <div class="logo-brand">GHP</div>
+      <div class="logo-sub">Back Office</div>
+    </div>
+
+    <div class="nav-section-title">Bán hàng</div>
+    <a href="orders.html" class="nav-item active">
+      <span class="nav-icon">📋</span>
+      <span>Quản lý Đơn hàng</span>
+    </a>
+
+    <!-- Extra items visible per role, rendered by JS -->
+    <div id="sidebarExtra"></div>
+
+    <div class="sidebar-footer">
+      <a href="../index.html" class="nav-item" style="border-radius:8px;">
+        <span class="nav-icon">🏠</span>
+        <span>Về trang chủ</span>
+      </a>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <div class="admin-content">
+
+    <!-- Top Bar -->
+    <header class="admin-topbar">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <button class="sidebar-toggle" onclick="toggleSidebar()">☰</button>
+        <nav class="admin-breadcrumb">
+          <a href="../index.html">GHP</a>
+          <span class="sep">›</span>
+          <span class="sep">Admin</span>
+          <span class="sep">›</span>
+          <span class="current">Quản lý Đơn hàng</span>
+        </nav>
+      </div>
+      <div class="admin-topbar-right">
+        <span class="role-badge" id="topRoleBadge"></span>
+        <span class="admin-user-name" id="topUserName"></span>
+        <button class="btn-logout" onclick="doLogout()">Đăng xuất</button>
+      </div>
+    </header>
+
+    <!-- Main -->
+    <main class="admin-main">
+
+      <div class="page-title">📋 Quản lý Đơn hàng</div>
+      <div class="page-subtitle">Xem và xử lý tất cả đơn hàng trong hệ thống</div>
+
+      <!-- KPI Cards -->
+      <div class="kpi-grid" id="kpiGrid">
+        <div class="kpi-card orange">
+          <div class="kpi-label">Tổng đơn hôm nay</div>
+          <div class="kpi-value" id="kpiToday">0</div>
+          <div class="kpi-sub">Tất cả trạng thái</div>
+        </div>
+        <div class="kpi-card blue">
+          <div class="kpi-label">Chờ xác nhận</div>
+          <div class="kpi-value" id="kpiPending">0</div>
+          <div class="kpi-sub">Cần xử lý</div>
+        </div>
+        <div class="kpi-card cyan">
+          <div class="kpi-label">Đang giao</div>
+          <div class="kpi-value" id="kpiShipping">0</div>
+          <div class="kpi-sub">Trên đường giao</div>
+        </div>
+        <div class="kpi-card red">
+          <div class="kpi-label">Có yêu cầu huỷ</div>
+          <div class="kpi-value" id="kpiCancelReq">0</div>
+          <div class="kpi-sub">Chờ duyệt</div>
+        </div>
+      </div>
+
+      <!-- Filters -->
+      <div class="filter-bar">
+        <input type="text" id="searchInput" class="filter-input" placeholder="🔍 Tìm mã đơn, khách hàng, SĐT..." oninput="applyFilters()" />
+        <select id="statusFilter" class="filter-select" onchange="applyFilters()">
+          <option value="">Tất cả trạng thái</option>
+          <option value="Pending">Chờ xác nhận</option>
+          <option value="Confirmed">Đã xác nhận</option>
+          <option value="Preparing">Đang chuẩn bị</option>
+          <option value="Shipping">Đang giao</option>
+          <option value="Completed">Hoàn thành</option>
+          <option value="Cancelled">Đã huỷ</option>
+        </select>
+        <select id="cancelFilter" class="filter-select" onchange="applyFilters()">
+          <option value="">Yêu cầu huỷ: Tất cả</option>
+          <option value="has">Có yêu cầu huỷ</option>
+        </select>
+        <button class="btn btn-secondary" onclick="clearFilters()">✕ Xoá bộ lọc</button>
+      </div>
+
+      <!-- Table Card -->
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <span class="admin-card-title">Danh sách đơn hàng</span>
+          <span id="tableCountLabel" style="font-size:13px;color:#888;"></span>
+        </div>
+
+        <div class="table-wrapper">
+          <table class="data-table" id="ordersTable">
+            <thead>
+              <tr>
+                <th>Mã đơn</th>
+                <th>Khách hàng</th>
+                <th>Tổng tiền</th>
+                <th>Ngày đặt</th>
+                <th>Trạng thái Đơn</th>
+                <th>TT Thanh toán</th>
+                <th>Yêu cầu Huỷ</th>
+                <th>Thao tác</th>
+              </tr>
+            </thead>
+            <tbody id="ordersTableBody">
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Empty state -->
+        <div class="empty-state" id="emptyState" style="display:none;">
+          <div class="empty-icon">📭</div>
+          <p>Không tìm thấy đơn hàng nào</p>
+        </div>
+
+        <!-- Pagination -->
+        <div class="pagination" id="paginationArea">
+          <span id="pageInfo"></span>
+          <div class="pagination-controls" id="pageControls"></div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ===== Confirm Dialog Modal ===== -->
+<div class="modal-overlay" id="confirmModal">
+  <div class="modal-box">
+    <div class="modal-title" id="confirmModalTitle">Xác nhận</div>
+    <div class="modal-body" id="confirmModalBody"></div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('confirmModal')">Huỷ</button>
+      <button class="btn btn-primary" id="confirmModalOkBtn" onclick="confirmModalOk()">Xác nhận</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== Reject Modal ===== -->
+<div class="modal-overlay" id="rejectModal">
+  <div class="modal-box">
+    <div class="modal-title">Từ chối đơn hàng</div>
+    <div class="modal-body">
+      <p style="margin-bottom:12px;">Vui lòng nhập lý do từ chối đơn hàng <strong id="rejectOrderId"></strong>:</p>
+      <div class="form-group">
+        <label class="form-label">Lý do từ chối <span style="color:#DC2626">*</span></label>
+        <textarea class="form-control" id="rejectReason" rows="3" placeholder="Nhập lý do..."></textarea>
+        <small id="rejectReasonErr" style="color:#DC2626;display:none;">Vui lòng nhập lý do từ chối</small>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-secondary" onclick="closeModal('rejectModal')">Đóng</button>
+      <button class="btn btn-danger" onclick="confirmReject()">✗ Từ chối đơn</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toastContainer"></div>
+
+<script src="../scripts/main.js"></script>
+<script>
+// ==================== DATA ====================
+const SAMPLE_ORDERS = [
+  {id:"GHP00000001", userId:1, customerName:"Nguyễn Thị Lan", customerPhone:"0901234567",
+   items:[{productId:1,name:"Bột mì đa dụng Meizan 1kg",qty:2,price:25000,unit:"túi"},{productId:5,name:"Bơ nhạt Anchor 200g",qty:1,price:45000,unit:"hộp"}],
+   contact:{name:"Nguyễn Thị Lan",phone:"0901234567"}, address:"123 Nguyễn Trãi, Phường 2, Quận 1, TP. Hồ Chí Minh",
+   deliveryFee:20000, subtotal:95000, total:115000, paymentMethod:"COD",
+   orderStatus:"Completed", paymentStatus:"Paid", createdAt:"2024-10-15T09:00:00", cancellationRequest:null,
+   timeline:[{status:"Pending",time:"2024-10-15T09:00:00"},{status:"Confirmed",time:"2024-10-15T10:30:00"},{status:"Preparing",time:"2024-10-15T14:00:00"},{status:"Shipping",time:"2024-10-16T08:00:00"},{status:"Completed",time:"2024-10-17T15:00:00"}]},
+
+  {id:"GHP00000002", userId:1, customerName:"Nguyễn Thị Lan", customerPhone:"0901234567",
+   items:[{productId:8,name:"Socola đen Valrhona 100g",qty:1,price:85000,unit:"thanh"},{productId:9,name:"Bột cacao Dutchess 250g",qty:2,price:65000,unit:"hộp"}],
+   contact:{name:"Nguyễn Thị Lan",phone:"0901234567"}, address:"123 Nguyễn Trãi, Phường 2, Quận 1, TP. Hồ Chí Minh",
+   deliveryFee:20000, subtotal:215000, total:235000, paymentMethod:"COD",
+   orderStatus:"Shipping", paymentStatus:"Unpaid", createdAt:"2024-11-01T14:30:00", cancellationRequest:null,
+   timeline:[{status:"Pending",time:"2024-11-01T14:30:00"},{status:"Confirmed",time:"2024-11-01T16:00:00"},{status:"Preparing",time:"2024-11-02T09:00:00"},{status:"Shipping",time:"2024-11-03T08:00:00"}]},
+
+  {id:"GHP00000003", userId:1, customerName:"Nguyễn Thị Lan", customerPhone:"0901234567",
+   items:[{productId:16,name:"Máy đánh trứng cầm tay 200W",qty:1,price:350000,unit:"cái"}],
+   contact:{name:"Nguyễn Thị Lan",phone:"0901234567"}, address:"123 Nguyễn Trãi, Phường 2, Quận 1, TP. Hồ Chí Minh",
+   deliveryFee:20000, subtotal:350000, total:370000, paymentMethod:"COD",
+   orderStatus:"Pending", paymentStatus:"Unpaid", createdAt:"2024-11-10T11:00:00", cancellationRequest:null,
+   timeline:[{status:"Pending",time:"2024-11-10T11:00:00"}]},
+
+  {id:"GHP00000004", userId:1, customerName:"Nguyễn Thị Lan", customerPhone:"0901234567",
+   items:[{productId:3,name:"Đường cát trắng Biên Hòa 1kg",qty:3,price:22000,unit:"túi"}],
+   contact:{name:"Nguyễn Thị Lan",phone:"0901234567"}, address:"123 Nguyễn Trãi, Phường 2, Quận 1, TP. Hồ Chí Minh",
+   deliveryFee:20000, subtotal:66000, total:86000, paymentMethod:"COD",
+   orderStatus:"Cancelled", paymentStatus:"Unpaid", createdAt:"2024-10-01T16:00:00",
+   cancellationRequest:{reason:"Đặt nhầm sản phẩm",status:"Approved",decidedAt:"2024-10-01T17:00:00"},
+   timeline:[{status:"Pending",time:"2024-10-01T16:00:00"},{status:"Cancelled",time:"2024-10-01T17:00:00",note:"Khách yêu cầu huỷ: Đặt nhầm sản phẩm"}]},
+
+  {id:"GHP00000005", userId:1, customerName:"Nguyễn Thị Lan", customerPhone:"0901234567",
+   items:[{productId:14,name:"Khuôn bánh tròn 20cm inox",qty:2,price:65000,unit:"cái"},{productId:15,name:"Túi bắt kem silicon 40cm",qty:3,price:35000,unit:"cái"}],
+   contact:{name:"Nguyễn Thị Lan",phone:"0901234567"}, address:"123 Nguyễn Trãi, Phường 2, Quận 1, TP. Hồ Chí Minh",
+   deliveryFee:20000, subtotal:235000, total:255000, paymentMethod:"COD",
+   orderStatus:"Confirmed", paymentStatus:"Unpaid", createdAt:"2024-11-09T10:00:00",
+   cancellationRequest:{reason:"Tìm thấy sản phẩm rẻ hơn",status:"Pending",requestedAt:"2024-11-09T12:00:00"},
+   timeline:[{status:"Pending",time:"2024-11-09T10:00:00"},{status:"Confirmed",time:"2024-11-09T11:00:00"}]},
+
+  {id:"GHP00000006", userId:null, customerName:"Trần Thị Mai", customerPhone:"0978901234",
+   items:[{productId:17,name:"Lò nướng mini 20L Electrolux",qty:1,price:1850000,unit:"cái"}],
+   contact:{name:"Trần Thị Mai",phone:"0978901234"}, address:"456 Lê Lợi, Phường Bến Nghé, Quận 1, TP. Hồ Chí Minh",
+   deliveryFee:20000, subtotal:1850000, total:1870000, paymentMethod:"COD",
+   orderStatus:"Preparing", paymentStatus:"Unpaid", createdAt:"2024-11-08T15:00:00", cancellationRequest:null,
+   timeline:[{status:"Pending",time:"2024-11-08T15:00:00"},{status:"Confirmed",time:"2024-11-08T16:30:00"},{status:"Preparing",time:"2024-11-09T09:00:00"}]},
+
+  {id:"GHP00000007", userId:null, customerName:"Lê Minh Tuấn", customerPhone:"0967890123",
+   items:[{productId:1,name:"Bột mì đa dụng Meizan 1kg",qty:5,price:25000,unit:"túi"},{productId:3,name:"Đường cát trắng Biên Hòa 1kg",qty:5,price:22000,unit:"túi"},{productId:12,name:"Bột nở Double Acting 100g",qty:2,price:18000,unit:"hộp"}],
+   contact:{name:"Lê Minh Tuấn",phone:"0967890123"}, address:"789 Đinh Tiên Hoàng, Quận Bình Thạnh, TP. Hồ Chí Minh",
+   deliveryFee:35000, subtotal:271000, total:306000, paymentMethod:"COD",
+   orderStatus:"Shipping", paymentStatus:"Unpaid", createdAt:"2024-11-07T08:00:00", cancellationRequest:null,
+   timeline:[{status:"Pending",time:"2024-11-07T08:00:00"},{status:"Confirmed",time:"2024-11-07T09:30:00"},{status:"Preparing",time:"2024-11-07T14:00:00"},{status:"Shipping",time:"2024-11-08T07:00:00"}]}
+];
+
+// ==================== STATE ====================
+function getAllOrders() {
+  const stored = localStorage.getItem('ghp_orders');
+  if (!stored) {
+    localStorage.setItem('ghp_orders', JSON.stringify(SAMPLE_ORDERS));
+    return JSON.parse(JSON.stringify(SAMPLE_ORDERS));
+  }
+  try {
+    const parsed = JSON.parse(stored);
+    let updated = false;
+    SAMPLE_ORDERS.forEach(def => {
+      if (!parsed.some(o => o.id === def.id)) {
+        parsed.push(def);
+        updated = true;
+      }
+    });
+    if (updated) localStorage.setItem('ghp_orders', JSON.stringify(parsed));
+    return parsed;
+  } catch (e) {
+    return JSON.parse(JSON.stringify(SAMPLE_ORDERS));
+  }
+}
+
+function saveOrderToStorage(updatedOrder) {
+  const all = getAllOrders();
+  const idx = all.findIndex(o => o.id === updatedOrder.id);
+  if (idx !== -1) {
+    all[idx] = updatedOrder;
+  } else {
+    all.push(updatedOrder);
+  }
+  localStorage.setItem('ghp_orders', JSON.stringify(all));
+}
+
+let orders = getAllOrders();
+let filteredOrders = [];
+let currentPage = 1;
+const PAGE_SIZE = 10;
+let pendingAction = null;
+let rejectTargetId = null;
+
+const STATUS_MAP = {
+  Pending:   "Chờ xác nhận",
+  Confirmed: "Đã xác nhận",
+  Preparing: "Đang chuẩn bị",
+  Shipping:  "Đang giao",
+  Completed: "Hoàn thành",
+  Cancelled: "Đã huỷ"
+};
+
+const STATUS_NEXT = {
+  Pending:   "Confirmed",
+  Confirmed: "Preparing",
+  Preparing: "Shipping",
+  Shipping:  "Completed"
+};
+
+// ==================== AUTH ====================
+function checkAuth() {
+  const raw = sessionStorage.getItem('ghp_user');
+  if (!raw) { window.location.href = '../login.html'; return null; }
+  const u = JSON.parse(raw);
+  if (u.role !== 'sales_staff' && u.role !== 'administrator') {
+    document.querySelector('.admin-main').innerHTML = `
+      <div class="error-403">
+        <div class="err-code">403</div>
+        <div class="err-msg">Không có quyền truy cập</div>
+        <p style="color:#aaa;">Bạn không có quyền xem trang này.</p>
+        <a href="../index.html" class="btn btn-primary" style="margin-top:16px;">Về trang chủ</a>
+      </div>`;
+    return null;
+  }
+  return u;
+}
+
+function renderTopBar(user) {
+  document.getElementById('topUserName').textContent = user.name;
+  const badge = document.getElementById('topRoleBadge');
+  badge.className = 'role-badge ' + user.role;
+  const roleLabels = {sales_staff:'Sales Staff',inventory_staff:'Inventory Staff',manager:'Manager',administrator:'Administrator'};
+  badge.textContent = roleLabels[user.role] || user.role;
+
+  let extraHtml = '';
+  if (user.role === 'administrator') {
+    extraHtml += `
+      <div class="nav-section-title">Kho hàng</div>
+      <a href="products.html" class="nav-item"><span class="nav-icon">📦</span><span>Sản phẩm & Danh mục</span></a>
+      <a href="inventory.html" class="nav-item"><span class="nav-icon">📊</span><span>Quản lý Tồn kho</span></a>
+      <div class="nav-section-title">Báo cáo</div>
+      <a href="reports.html" class="nav-item"><span class="nav-icon">📈</span><span>Báo cáo Doanh thu</span></a>
+      <div class="nav-section-title">Quản trị</div>
+      <a href="users.html" class="nav-item"><span class="nav-icon">👥</span><span>Quản lý Người dùng</span></a>
+      <a href="delivery-config.html" class="nav-item"><span class="nav-icon">🚚</span><span>Cấu hình Giao hàng</span></a>
+      <a href="audit-log.html" class="nav-item"><span class="nav-icon">📝</span><span>Nhật ký Kiểm tra</span></a>`;
+  }
+  document.getElementById('sidebarExtra').innerHTML = extraHtml;
+}
+
+function doLogout() {
+  sessionStorage.removeItem('ghp_user');
+  window.location.href = '../login.html';
+}
+
+function toggleSidebar() {
+  document.getElementById('adminSidebar').classList.toggle('open');
+  document.getElementById('sidebarBackdrop').classList.toggle('open');
+}
+function closeSidebar() {
+  document.getElementById('adminSidebar').classList.remove('open');
+  document.getElementById('sidebarBackdrop').classList.remove('open');
+}
+
+// ==================== KPI ====================
+function renderKPI() {
+  const today = new Date().toDateString();
+  const todayOrders = orders.filter(o => new Date(o.createdAt).toDateString() === today);
+  document.getElementById('kpiToday').textContent = todayOrders.length;
+  document.getElementById('kpiPending').textContent = orders.filter(o => o.orderStatus === 'Pending').length;
+  document.getElementById('kpiShipping').textContent = orders.filter(o => o.orderStatus === 'Shipping').length;
+  document.getElementById('kpiCancelReq').textContent = orders.filter(o => o.cancellationRequest && o.cancellationRequest.status === 'Pending').length;
+}
+
+// ==================== FILTERS ====================
+function applyFilters() {
+  const kw = document.getElementById('searchInput').value.toLowerCase().trim();
+  const statusF = document.getElementById('statusFilter').value;
+  const cancelF = document.getElementById('cancelFilter').value;
+
+  filteredOrders = orders.filter(o => {
+    if (kw) {
+      const hay = (o.id + o.customerName + o.customerPhone).toLowerCase();
+      if (!hay.includes(kw)) return false;
+    }
+    if (statusF && o.orderStatus !== statusF) return false;
+    if (cancelF === 'has' && !o.cancellationRequest) return false;
+    return true;
+  });
+
+  currentPage = 1;
+  renderTable();
+}
+
+function clearFilters() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('statusFilter').value = '';
+  document.getElementById('cancelFilter').value = '';
+  applyFilters();
+}
+
+// ==================== TABLE ====================
+function renderTable() {
+  const tbody = document.getElementById('ordersTableBody');
+  const total = filteredOrders.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  currentPage = Math.min(currentPage, totalPages);
+  const start = (currentPage - 1) * PAGE_SIZE;
+  const slice = filteredOrders.slice(start, start + PAGE_SIZE);
+
+  document.getElementById('tableCountLabel').textContent = `${total} đơn hàng`;
+  document.getElementById('emptyState').style.display = total === 0 ? 'block' : 'none';
+  document.getElementById('paginationArea').style.display = total === 0 ? 'none' : 'flex';
+
+  tbody.innerHTML = slice.map(o => {
+    const statusCls = o.orderStatus.toLowerCase();
+    const payCls = o.paymentStatus === 'Paid' ? 'paid' : 'unpaid';
+    const payLabel = o.paymentStatus === 'Paid' ? 'Đã thanh toán' : 'Chưa TT';
+
+    let cancelCell = '<span style="color:#ccc;">–</span>';
+    if (o.cancellationRequest) {
+      const st = o.cancellationRequest.status;
+      if (st === 'Pending')  cancelCell = '<span class="cancel-req-badge pending">⚠ Chờ duyệt</span>';
+      if (st === 'Approved') cancelCell = '<span class="cancel-req-badge approved">✓ Đã duyệt</span>';
+      if (st === 'Rejected') cancelCell = '<span class="cancel-req-badge rejected">✗ Từ chối</span>';
+    }
+
+    let actions = `<a href="order-detail.html?id=${o.id}" class="btn-action view">🔍 Xem chi tiết</a>`;
+    if (o.orderStatus === 'Pending') {
+      actions += `<button class="btn-action confirm" onclick="quickConfirm('${o.id}')">✓ Xác nhận</button>`;
+      actions += `<button class="btn-action reject"  onclick="openRejectModal('${o.id}')">✗ Từ chối</button>`;
+    } else if (STATUS_NEXT[o.orderStatus]) {
+      actions += `<button class="btn-action advance" onclick="quickAdvance('${o.id}')">→ ${STATUS_MAP[STATUS_NEXT[o.orderStatus]]}</button>`;
+    }
+
+    return `<tr>
+      <td><span class="order-id">${o.id}</span></td>
+      <td>
+        <div style="font-weight:600;">${o.customerName}</div>
+        <div style="color:#888;font-size:12px;">${o.customerPhone}</div>
+      </td>
+      <td style="font-weight:700;color:#D97745;">${formatVND(o.total)}</td>
+      <td style="color:#666;font-size:13px;">${fmtDate(o.createdAt)}</td>
+      <td><span class="status-badge ${statusCls}">${STATUS_MAP[o.orderStatus]}</span></td>
+      <td><span class="status-badge ${payCls}">${payLabel}</span></td>
+      <td>${cancelCell}</td>
+      <td>${actions}</td>
+    </tr>`;
+  }).join('');
+
+  renderPagination(total, totalPages);
+}
+
+function renderPagination(total, totalPages) {
+  const info = document.getElementById('pageInfo');
+  const controls = document.getElementById('pageControls');
+  const start = (currentPage - 1) * PAGE_SIZE + 1;
+  const end = Math.min(currentPage * PAGE_SIZE, total);
+  info.textContent = total > 0 ? `Hiển thị ${start}–${end} / ${total} đơn` : '';
+
+  let html = `<button class="page-btn" onclick="goPage(${currentPage - 1})" ${currentPage === 1 ? 'disabled' : ''}>‹</button>`;
+  for (let p = 1; p <= totalPages; p++) {
+    if (totalPages <= 7 || Math.abs(p - currentPage) <= 2 || p === 1 || p === totalPages) {
+      html += `<button class="page-btn ${p === currentPage ? 'active' : ''}" onclick="goPage(${p})">${p}</button>`;
+    } else if (Math.abs(p - currentPage) === 3) {
+      html += `<span style="padding:0 4px;color:#ccc;">…</span>`;
+    }
+  }
+  html += `<button class="page-btn" onclick="goPage(${currentPage + 1})" ${currentPage === totalPages ? 'disabled' : ''}>›</button>`;
+  controls.innerHTML = html;
+}
+
+function goPage(p) {
+  const totalPages = Math.ceil(filteredOrders.length / PAGE_SIZE);
+  if (p < 1 || p > totalPages) return;
+  currentPage = p;
+  renderTable();
+}
+
+// ==================== QUICK ACTIONS ====================
+function quickConfirm(orderId) {
+  pendingAction = { type: 'advance', orderId, to: 'Confirmed' };
+  document.getElementById('confirmModalTitle').textContent = 'Xác nhận đơn hàng';
+  document.getElementById('confirmModalBody').innerHTML =
+    `Xác nhận đơn hàng <strong>${orderId}</strong>?<br>Trạng thái sẽ chuyển sang <strong>Đã xác nhận</strong>.`;
+  document.getElementById('confirmModalOkBtn').className = 'btn btn-success';
+  document.getElementById('confirmModalOkBtn').textContent = 'Xác nhận';
+  document.getElementById('confirmModal').classList.add('open');
+}
+
+function quickAdvance(orderId) {
+  const o = orders.find(x => x.id === orderId);
+  if (!o) return;
+  const to = STATUS_NEXT[o.orderStatus];
+  if (!to) return;
+  pendingAction = { type: 'advance', orderId, to };
+  document.getElementById('confirmModalTitle').textContent = 'Chuyển trạng thái đơn hàng';
+  document.getElementById('confirmModalBody').innerHTML =
+    `Chuyển đơn hàng <strong>${orderId}</strong> từ <strong>${STATUS_MAP[o.orderStatus]}</strong> sang <strong>${STATUS_MAP[to]}</strong>?`;
+  document.getElementById('confirmModalOkBtn').className = 'btn btn-primary';
+  document.getElementById('confirmModalOkBtn').textContent = 'Xác nhận';
+  document.getElementById('confirmModal').classList.add('open');
+}
+
+function confirmModalOk() {
+  if (!pendingAction) return;
+  const { type, orderId, to } = pendingAction;
+  if (type === 'advance') {
+    advanceOrder(orderId, to);
+  }
+  closeModal('confirmModal');
+  pendingAction = null;
+}
+
+function advanceOrder(orderId, to) {
+  const o = orders.find(x => x.id === orderId);
+  if (!o) return;
+  o.orderStatus = to;
+  if (!o.timeline) o.timeline = [];
+  o.timeline.push({ status: to, time: new Date().toISOString() });
+  saveOrderToStorage(o);
+  showToast(`Đơn hàng ${orderId} đã chuyển sang ${STATUS_MAP[to]}`, 'success');
+  renderKPI();
+  applyFilters();
+}
+
+function openRejectModal(orderId) {
+  rejectTargetId = orderId;
+  document.getElementById('rejectOrderId').textContent = orderId;
+  document.getElementById('rejectReason').value = '';
+  document.getElementById('rejectReasonErr').style.display = 'none';
+  document.getElementById('rejectModal').classList.add('open');
+}
+
+function confirmReject() {
+  const reason = document.getElementById('rejectReason').value.trim();
+  if (!reason) {
+    document.getElementById('rejectReasonErr').style.display = 'block';
+    return;
+  }
+  const o = orders.find(x => x.id === rejectTargetId);
+  if (!o) return;
+  o.orderStatus = 'Cancelled';
+  if (!o.timeline) o.timeline = [];
+  o.timeline.push({ status: 'Cancelled', time: new Date().toISOString(), note: 'Nhân viên từ chối: ' + reason });
+  saveOrderToStorage(o);
+  closeModal('rejectModal');
+  showToast(`Đã từ chối đơn hàng ${rejectTargetId}`, 'error');
+  rejectTargetId = null;
+  renderKPI();
+  applyFilters();
+}
+
+// ==================== MODAL / TOAST HELPERS ====================
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+function showToast(msg, type = 'success') {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${type === 'success' ? '✓' : type === 'error' ? '✕' : 'ℹ'}</span> ${msg}`;
+  c.appendChild(t);
+  setTimeout(() => t.remove(), 3500);
+}
+
+function formatVND(n) {
+  return n.toLocaleString('vi-VN') + ' ₫';
+}
+
+function fmtDate(iso) {
+  if (!iso) return '–';
+  const d = new Date(iso);
+  return d.toLocaleDateString('vi-VN', { day:'2-digit', month:'2-digit', year:'numeric' }) + ' ' +
+         d.toLocaleTimeString('vi-VN', { hour:'2-digit', minute:'2-digit' });
+}
+
+// Close modal on backdrop click
+document.querySelectorAll('.modal-overlay').forEach(el => {
+  el.addEventListener('click', e => { if (e.target === el) el.classList.remove('open'); });
+});
+
+// ==================== INIT ====================
+(function init() {
+  const user = checkAuth();
+  if (!user) return;
+  renderTopBar(user);
+  applyFilters();
+  renderKPI();
+})();
+</script>
+</body>
+</html>
